@@ -1,12 +1,17 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Скриньки</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Карткова гра «Скриньки» на 54 карти для 2–6 гравців. Заходьте за кодом гри просто з браузера.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@700&family=Unbounded:wght@600;700&display=swap">
 <style>
 /* Layout: one column on phones (table, last ask, hand, sticky action bar, chat); from 900px the chat becomes a sticky right column. */
 :root{
+  color-scheme:light;
   --bg:#e8eef0; --surface:#ffffff; --surface-2:#f0f5f6; --fg:#10242b; --muted:#566b73; --line:#cbd8dc;
-  --accent:#0d6e80; --on-accent:#ffffff; --turn:#f0a92b; --ok:#1a7f4b; --warn:#935f00;
+  --accent:#0d6e80; --on-accent:#ffffff; --turn:#f0a92b; --ok:#1a7f4b; --warn:#935f00; --bad:#b3261e;
   --table:#17505e; --table-2:#0f3d49; --table-fg:#eaf4f6; --table-muted:#a9c6ce;
   --card:#fffdfa; --card-ink:#1b2328; --red:#c2312d; --back-1:#2f66b0; --back-2:#1f4a84;
   --p0:#3d7fe0; --p1:#d9484d; --p2:#2e9d66; --p3:#c98a0a; --p4:#8a4fc4; --p5:#12968a;
@@ -17,21 +22,23 @@
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#0a1519; --surface:#11232a; --surface-2:#173039; --fg:#e6f0f2; --muted:#93aab2; --line:#264550;
-    --accent:#35b8ce; --on-accent:#04242b; --ok:#5fd394; --warn:#f0b64a;
+    --accent:#35b8ce; --on-accent:#04242b; --ok:#5fd394; --warn:#f0b64a; --bad:#ff8f87;
     --table:#0f3a45; --table-2:#0a2a33;
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --bg:#0a1519; --surface:#11232a; --surface-2:#173039; --fg:#e6f0f2; --muted:#93aab2; --line:#264550;
-  --accent:#35b8ce; --on-accent:#04242b; --ok:#5fd394; --warn:#f0b64a;
+  --accent:#35b8ce; --on-accent:#04242b; --ok:#5fd394; --warn:#f0b64a; --bad:#ff8f87;
   --table:#0f3a45; --table-2:#0a2a33;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
+html{background:var(--bg)}
 body{
-  background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15px;line-height:1.45;
-  padding-block:16px;
+  margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15px;line-height:1.45;
+  padding-block:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-bottom,0px));
   padding-left:max(16px,env(safe-area-inset-left,0px));
   padding-right:max(16px,env(safe-area-inset-right,0px));
 }
@@ -42,9 +49,7 @@ button{font:inherit;color:inherit}
 .muted{color:var(--muted)}
 .eyebrow{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}
-.err{color:#b3261e;font-weight:600}
-:root[data-theme="dark"] .err{color:#ff8f87}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .err{color:#ff8f87}}
+.err{color:var(--bad);font-weight:600}
 
 /* buttons and inputs */
 .btn{
@@ -80,6 +85,8 @@ label{font-weight:700;font-size:13px}
 .rules{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
 .rules summary{cursor:pointer;font-weight:700}
 .rules ul{padding-left:18px;margin-top:10px;display:grid;gap:6px;color:var(--muted)}
+.saved{display:grid;gap:10px;border-color:var(--accent)}
+.saved .row{flex-wrap:wrap}
 
 /* lobby */
 .lobby,.loading{max-width:520px;margin:0 auto;display:grid;gap:16px}
@@ -90,7 +97,9 @@ label{font-weight:700;font-size:13px}
 .lp .nm{font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .av{width:30px;height:30px;border-radius:50%;background:var(--pc);color:#fff;display:inline-grid;place-items:center;font-weight:800;flex:none}
 .tag{font-size:11px;font-weight:700;padding:1px 8px;border-radius:99px;background:var(--surface-2);color:var(--muted);flex:none}
+.tag.off{background:var(--bad);color:#fff}
 .stack{display:grid;gap:10px}
+.net{background:var(--turn);color:#2a1c00;font-weight:700;padding:8px 12px;border-radius:10px;text-align:center}
 
 /* cards */
 .card{
@@ -102,6 +111,8 @@ label{font-weight:700;font-size:13px}
 .card i{position:absolute;left:6px;top:26px;font-size:15px;line-height:1;font-style:normal}
 .card::after{content:attr(data-s);position:absolute;right:6px;bottom:3px;font-size:30px;line-height:1}
 .card.red{color:var(--red)}
+.card.joker b{font-size:13px;top:6px}
+.card.joker::after{left:0;right:0;bottom:auto;top:26px;text-align:center;font-size:34px}
 .hand-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .hand{display:flex;flex-wrap:wrap;gap:10px 14px;padding:8px 2px 4px;min-height:96px}
 .grp{display:flex;padding:4px;border:2px solid transparent;border-radius:10px;background:none;transition:transform .12s}
@@ -132,6 +143,7 @@ button.grp:hover{transform:translateY(-4px)}
 .plh{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
 .plh .nm{font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
 .table .tag{background:rgba(255,255,255,.16);color:var(--table-fg)}
+.table .tag.off{background:var(--bad);color:#fff}
 .pill-turn{background:var(--turn);color:#2a1c00;font-weight:800;font-size:10.5px;padding:2px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:.06em}
 .plc{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .fan{display:flex;height:44px;min-width:30px}
@@ -158,7 +170,7 @@ button.grp:hover{transform:translateY(-4px)}
 /* action bar */
 .action{
   position:sticky;bottom:0;z-index:5;background:var(--surface);border:1px solid var(--line);border-radius:14px;
-  padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px));display:grid;gap:10px;box-shadow:0 -6px 18px rgba(0,0,0,.12);
+  padding:12px 14px;display:grid;gap:10px;box-shadow:0 -6px 18px rgba(0,0,0,.12);
 }
 .steps{display:grid;gap:6px}
 .stp{display:flex;gap:10px;align-items:center;min-width:0}
@@ -206,7 +218,8 @@ button.grp:hover{transform:translateY(-4px)}
   .grp{transition:none}
 }
 </style>
-
+</head>
+<body>
 <main class="wrap">
 
   <section id="screen-entry" class="entry">
@@ -217,7 +230,14 @@ button.grp:hover{transform:translateY(-4px)}
         <span class="card red c3" data-s="♦"><b>Т</b><i>♦</i></span>
       </div>
       <h1>Скриньки</h1>
-      <p class="lead">Карткова гра на 52 карти для 2–6 гравців. Питайте карти один в одного й збирайте скриньки: чотири однакові карти.</p>
+      <p class="lead">Карткова гра на 54 карти для 2–6 гравців. Питайте карти один в одного й збирайте скриньки: чотири однакові карти або двоє джокерів.</p>
+    </div>
+    <div id="saved" class="panel saved" hidden>
+      <p id="saved-text"></p>
+      <div class="row">
+        <button id="btn-resume" class="btn" type="button">Продовжити</button>
+        <button id="btn-forget" class="btn ghost" type="button">Забути</button>
+      </div>
     </div>
     <div class="panel form">
       <label for="nick">Ваше ім’я в грі</label>
@@ -234,13 +254,13 @@ button.grp:hover{transform:translateY(-4px)}
     <details class="rules">
       <summary>Правила</summary>
       <ul>
-        <li>Роздача: кожен отримує по 4 карти, скільки б не було гравців. Решта карт лежить у колоді.</li>
-        <li>Якщо вже в роздачі в когось склалася скринька, вона одразу викладається на стіл, а цей гравець добирає з колоди ще 4 карти.</li>
-        <li>На своєму ході оберіть гравця й ранг, який є у вас у руці, і спитайте, чи є такі карти в нього.</li>
+        <li>У колоді 54 карти: 52 звичайні й 2 джокери. Кожен гравець отримує по 4 карти, скільки б не було гравців.</li>
+        <li>Якщо вже в роздачі в когось склалася скринька, вона одразу викладається на стіл, а цей гравець добирає з колоди стільки ж карт, скільки виклав (чотири або два).</li>
+        <li>На своєму ході оберіть гравця й ранг, який є у вас у руці, і спитайте, чи є такі карти в нього. Просити карти, яких у вас немає, не можна.</li>
         <li>Якщо є, він віддає всі карти цього рангу, і ви ходите ще раз.</li>
-        <li>Якщо нема, ви беретеся за колоду. Витягли той самий ранг: ходіть ще раз. Інший: хід переходить далі.</li>
-        <li>Чотири карти одного рангу складаються в скриньку й викладаються на стіл.</li>
-        <li>Гра закінчується, коли викладено всі 13 скриньок. Перемагає той, у кого їх більше.</li>
+        <li>Якщо нема, ви берете карту з колоди. Витягли той самий ранг: ходіть ще раз. Інший: хід переходить далі.</li>
+        <li>Скринька: чотири карти одного рангу або двоє джокерів. Їх викладають на стіл.</li>
+        <li>Гра закінчується, коли викладено всі 14 скриньок. Перемагає той, у кого їх більше.</li>
         <li>Чат запам’ятовує запити за два останні кола: хто в кого й що питав.</li>
       </ul>
     </details>
@@ -248,20 +268,21 @@ button.grp:hover{transform:translateY(-4px)}
 
   <section id="screen-loading" class="loading" hidden>
     <div class="panel stack">
-      <p><b>Підключаємося до гри…</b></p>
+      <p><b id="loading-title">Підключаємося до гри…</b></p>
       <p id="loading-note" class="muted"></p>
       <button class="btn ghost" type="button" data-act="leave">Вийти</button>
     </div>
   </section>
 
   <section id="screen-lobby" class="lobby" hidden>
+    <div id="net-lobby" class="net" hidden></div>
     <div class="panel stack">
       <p class="eyebrow">Код гри</p>
       <div class="codebox">
         <span id="lobby-code" class="code"></span>
         <button class="btn ghost" type="button" data-act="copy">Скопіювати</button>
       </div>
-      <p class="muted">Друзі відкривають цю сторінку, вводять код у полі «Код гри» й тиснуть «Приєднатися».</p>
+      <p class="muted">Друзі відкривають цю сторінку, вводять код у полі «Код гри» й тиснуть «Приєднатися». Ведучий має тримати цю вкладку відкритою.</p>
     </div>
     <div class="stack">
       <p class="eyebrow" id="lobby-count"></p>
@@ -273,13 +294,14 @@ button.grp:hover{transform:translateY(-4px)}
   <section id="screen-game" hidden>
     <div class="layout">
       <div class="main">
+        <div id="net-game" class="net" hidden></div>
         <div class="table">
           <div class="stats">
             <div class="st"><span class="eyebrow">Код</span><b id="g-code"></b></div>
             <div class="st"><span class="eyebrow">Колода</span><b id="g-deck"></b></div>
             <div class="st"><span class="eyebrow">Коло</span><b id="g-round"></b></div>
             <div class="st"><span class="eyebrow">Скриньки</span><b id="g-books"></b></div>
-            <button class="btn ghost sm" type="button" data-act="leave">Вийти</button>
+            <button id="btn-leave-game" class="btn ghost sm" type="button" data-act="leave">Вийти</button>
           </div>
           <div id="players" class="players"></div>
         </div>
@@ -304,20 +326,26 @@ button.grp:hover{transform:translateY(-4px)}
 </main>
 <div id="toast" class="toast" role="status" hidden></div>
 
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
 (function(){
 'use strict';
 
 // ==LOGIC-START==
-const rankOf=c=>c%13, suitOf=c=>Math.floor(c/13);
+const NCARDS=54,NBOOKS=14;
+const rankOf=c=>c>=52?13:c%13, suitOf=c=>c>=52?4:Math.floor(c/13);
+const bookSize=r=>r===13?2:4;
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=a[i];a[i]=a[j];a[j]=t}return a}
 function layBooks(S,u){
   const cnt={};
   S.hands[u].forEach(c=>{const r=rankOf(c);cnt[r]=(cnt[r]||0)+1});
+  let laid=0;
   Object.keys(cnt).forEach(k=>{
-    if(cnt[k]===4){const r=+k;S.hands[u]=S.hands[u].filter(c=>rankOf(c)!==r);S.books[u].push(r)}
+    const r=+k;
+    if(cnt[k]===bookSize(r)){S.hands[u]=S.hands[u].filter(c=>rankOf(c)!==r);S.books[u].push(r);laid+=cnt[k]}
   });
   S.books[u].sort((a,b)=>a-b);
+  return laid;
 }
 function nextPlayer(S,order,who){
   const i=order.indexOf(who),n=(i+1)%order.length;
@@ -326,7 +354,7 @@ function nextPlayer(S,order,who){
 }
 function totalBooks(S,order){return order.reduce((s,u)=>s+S.books[u].length,0)}
 function settle(S,order,current,keep){
-  if(totalBooks(S,order)>=13){S.status='done';S.turn=current;return}
+  if(totalBooks(S,order)>=NBOOKS){S.status='done';S.turn=current;return}
   let who=keep?current:nextPlayer(S,order,current);
   for(let i=0;i<=order.length;i++){
     if(S.hands[who].length===0&&S.deck.length){S.hands[who].push(S.deck.pop());layBooks(S,who)}
@@ -345,11 +373,13 @@ function finish(S,g,entry){
   return {patch:{hands:S.hands,books:S.books,deck:S.deck,turn:S.turn,round:S.round,status:S.status,asks:asks},roundChanged:S.round>g.round};
 }
 function canAsk(g,a,t,rank){
-  if(!g||g.status!=='play'||g.turn!==a||t===a||g.order.indexOf(t)<0)return false;
+  if(!g||g.status!=='play'||g.turn!==a||t===a||(g.order||[]).indexOf(t)<0)return false;
+  if(!Number.isInteger(rank)||rank<0||rank>13)return false;
   if(!(g.hands[a]||[]).some(c=>rankOf(c)===rank))return false;
   return g.deck.length>0||(g.hands[t]||[]).length>0;
 }
 function applyAsk(g,a,t,rank){
+  if(!canAsk(g,a,t,rank))return null;
   const S=workState(g);
   let got=0,drew=0,lucky=0,keep=false;
   const give=S.hands[t].filter(c=>rankOf(c)===rank);
@@ -374,25 +404,78 @@ function applySkip(g){
   return finish(S,g,entry);
 }
 function dealGame(ids,fixedDeck){
-  const order=shuffle(ids),S={hands:{},books:{},deck:fixedDeck?fixedDeck.slice():shuffle(Array.from({length:52},(_,i)=>i)),round:1};
-  const per=4;
+  const order=shuffle(ids),S={hands:{},books:{},deck:fixedDeck?fixedDeck.slice():shuffle(Array.from({length:NCARDS},(_,i)=>i)),round:1};
   order.forEach(u=>{S.hands[u]=[];S.books[u]=[]});
-  for(let i=0;i<per;i++)order.forEach(u=>S.hands[u].push(S.deck.pop()));
-  order.forEach(u=>layBooks(S,u));
+  for(let i=0;i<4;i++)order.forEach(u=>S.hands[u].push(S.deck.pop()));
   order.forEach(u=>{
-    while(S.hands[u].length===0&&S.deck.length>=4){
-      for(let i=0;i<4;i++)S.hands[u].push(S.deck.pop());
-      layBooks(S,u);
+    let laid=layBooks(S,u);
+    while(laid>0&&S.deck.length>0){
+      const n=Math.min(laid,S.deck.length);
+      for(let i=0;i<n;i++)S.hands[u].push(S.deck.pop());
+      laid=layBooks(S,u);
     }
   });
   return {order:order,hands:S.hands,books:S.books,deck:S.deck};
 }
+
+/* ---- host-side game state: the host's browser is the only place that holds every hand ---- */
+function newLobby(code,hostPid,name){
+  const p={};p[hostPid]={name:name,at:Date.now()};
+  return {code:code,hostPid:hostPid,status:'lobby',created:Date.now(),players:p,order:[],hands:{},books:{},deck:[],turn:null,round:0,asks:[],chat:[]};
+}
+function addPlayer(S,pid,name){
+  if(S.players[pid])return null;
+  if(S.status!=='lobby')return 'Ця гра вже почалась.';
+  if(Object.keys(S.players).length>=6)return 'У грі вже шестеро гравців.';
+  S.players[pid]={name:name,at:Date.now()};
+  return null;
+}
+function startGameS(S){
+  if(S.status!=='lobby')return 'Гра вже йде.';
+  const ids=Object.keys(S.players).sort((a,b)=>S.players[a].at-S.players[b].at).slice(0,6);
+  if(ids.length<2)return 'Потрібно щонайменше двоє гравців.';
+  const d=dealGame(ids);
+  Object.assign(S,{status:'play',order:d.order,hands:d.hands,books:d.books,deck:d.deck,turn:d.order[0],round:1,asks:[],chat:[]});
+  return null;
+}
+function pruneChat(S){S.chat=S.chat.filter(m=>m.r>=S.round-1).slice(-150)}
+function handleAsk(S,pid,to,rank){
+  const res=applyAsk(S,pid,to,rank);
+  if(!res)return 'Такий хід не дозволений: питати можна лише ранг, який є у вашій руці, і лише на своєму ході.';
+  Object.assign(S,res.patch);
+  if(res.roundChanged)pruneChat(S);
+  return null;
+}
+function handleSkip(S,pid){
+  if(S.status!=='play'||pid!==S.hostPid||S.turn===pid)return 'Пропустити можна лише хід іншого гравця.';
+  const res=applySkip(S);
+  Object.assign(S,res.patch);
+  if(res.roundChanged)pruneChat(S);
+  return null;
+}
+function handleChat(S,pid,text){
+  const t=String(text||'').trim().slice(0,200);
+  if(!t||!S.players[pid])return;
+  S.chat.push({u:pid,t:t,ts:Date.now(),r:S.round});
+  pruneChat(S);
+}
+function backToLobby(S){
+  Object.assign(S,{status:'lobby',order:[],hands:{},books:{},deck:[],turn:null,round:0,asks:[],chat:[]});
+}
+function viewFor(S,pid){
+  const counts={},players={};
+  (S.order||[]).forEach(u=>{counts[u]=(S.hands[u]||[]).length});
+  Object.keys(S.players).forEach(u=>{players[u]={name:S.players[u].name,at:S.players[u].at}});
+  return {code:S.code,status:S.status,host:S.hostPid,order:S.order,players:players,counts:counts,books:S.books,
+    deckN:S.deck.length,turn:S.turn,round:S.round,asks:S.asks,chat:S.chat.filter(m=>m.r>=S.round-1),hand:(S.hands[pid]||[]).slice()};
+}
 // ==LOGIC-END==
 
-const RANKS=['Т','2','3','4','5','6','7','8','9','10','В','Д','К'];
-const RANK_NAMES=['Туз','Двійка','Трійка','Четвірка',"П'ятірка",'Шістка','Сімка','Вісімка',"Дев'ятка",'Десятка','Валет','Дама','Король'];
+const RANKS=['Т','2','3','4','5','6','7','8','9','10','В','Д','К','★'];
+const RANK_NAMES=['Туз','Двійка','Трійка','Четвірка',"П'ятірка",'Шістка','Сімка','Вісімка',"Дев'ятка",'Десятка','Валет','Дама','Король','Джокер'];
 const SUITS=['♠','♥','♦','♣'];
 const CODE_CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const PEER_PREFIX='skrynky-';
 const CHEST='<svg viewBox="0 0 22 18" width="22" height="18" aria-hidden="true"><path d="M2 7a5 5 0 0 1 5-5h8a5 5 0 0 1 5 5v1H2z" fill="currentColor" opacity=".55"/><rect x="2" y="8" width="18" height="8" rx="1.5" fill="currentColor"/><rect x="9" y="6.5" width="4" height="4" rx="1" style="fill:var(--turn)"/></svg>';
 
 const $=id=>document.getElementById(id);
@@ -404,21 +487,38 @@ const store={
 };
 const plural=(n,f)=>{const m=n%10,h=n%100;return h>=11&&h<=14?f[2]:m===1?f[0]:(m>=2&&m<=4)?f[1]:f[2]};
 const initial=n=>(Array.from(String(n||'?'))[0]||'?').toUpperCase();
+const SAVE_TTL=12*3600*1000;
 
-let db=null,me=null,code=null,G=null,msgs=[],busy=false,selT=null,selR=null,prevTurn=null;
-let unsubG=null,unsubM=null,loadTimer=null;
+/* ---------- identity ---------- */
+function makeId(){
+  let s='';
+  const a=new Uint8Array(10);
+  try{crypto.getRandomValues(a);}catch(e){for(let i=0;i<10;i++)a[i]=Math.floor(Math.random()*256)}
+  a.forEach(b=>{s+=b.toString(36).padStart(2,'0')});
+  return 'p'+s;
+}
+let me=store.get('skrynky:pid');
+if(!me||!/^p[0-9a-z]{20}$/.test(me)){me=makeId();store.set('skrynky:pid',me)}
 
-const ref=()=>db.doc('games/'+code);
+/* ---------- state ---------- */
+let G=null;            // what this screen draws (a materialised view)
+let S=null;            // host only: the full game
+let role=null,roomCode=null,myName='';
+let peer=null,conns={},hostConn=null;
+let busy=false,busyTimer=null,selT=null,selR=null,prevTurn=null,prevAsks=-1;
+let loadTimer=null,reconnTimer=null,retryTimer=null,hbTimer=null,lastSeen=0,netDown=false,creating=false,attempts=0;
+
 const nm=u=>(G&&G.players&&G.players[u]&&G.players[u].name)||'Гравець';
 const ci=u=>{const o=(G&&G.order)||[];const i=o.indexOf(u);return i<0?0:i};
 const pcv=u=>'var(--p'+(ci(u)%6)+')';
 const chip=k=>'<span class="rk">'+RANKS[k]+'</span>';
 const cardHTML=c=>{
+  if(c>=52){return '<span class="card joker'+(c===52?' red':'')+'" data-s="★"><b>Дж</b><i></i></span>'}
   const s=SUITS[suitOf(c)],red=suitOf(c)===1||suitOf(c)===2;
   return '<span class="card'+(red?' red':'')+'" data-s="'+s+'"><b>'+RANKS[rankOf(c)]+'</b><i>'+s+'</i></span>';
 };
 const isMyTurn=()=>!!G&&G.status==='play'&&G.turn===me&&(G.order||[]).indexOf(me)>=0;
-const newGid=()=>'g'+Date.now().toString(36)+Math.floor(Math.random()*1296).toString(36);
+const isHost=()=>role==='host';
 
 function show(name){['entry','loading','lobby','game'].forEach(n=>{$('screen-'+n).hidden=n!==name})}
 function entryErr(t){const e=$('entry-err');e.textContent=t||'';e.hidden=!t}
@@ -426,169 +526,303 @@ function toast(t){
   const el=$('toast');el.textContent=t;el.hidden=false;
   clearTimeout(toast.t);toast.t=setTimeout(()=>{el.hidden=true},4500);
 }
-function dbErr(e){
-  const c=e&&e.code;
-  if(c==='invalid_argument')return 'Запис не вдався. Якщо у вас доступ лише для перегляду, попросіть власника гри дати права «Учасник».';
-  if(c==='quota_exceeded')return 'Сховище гри заповнене.';
-  if(c==='resource_exhausted')return 'Забагато дій підряд. Зачекайте секунду.';
-  if(c==='revoked')return 'Доступ до гри втрачено. Відкрийте сторінку знову.';
-  return 'Не вдалося зв’язатися зі сховищем. Спробуйте ще раз.';
-}
 function cleanName(s){return String(s||'').replace(/\s+/g,' ').trim().slice(0,16)}
 function genCode(){let s='';for(let i=0;i<5;i++)s+=CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)];return s}
-function lockEntry(){['btn-create','btn-join','nick','code'].forEach(id=>{$(id).disabled=true})}
+function setNet(msg){
+  ['net-lobby','net-game'].forEach(id=>{const el=$(id);el.textContent=msg||'';el.hidden=!msg});
+}
+function clone(o){return JSON.parse(JSON.stringify(o))}
 
-/* ---------- entering and leaving rooms ---------- */
+/* ---------- saved sessions (so a refresh does not lose the game) ---------- */
+function readSaved(){
+  try{
+    const h=JSON.parse(store.get('skrynky:host')||'null');
+    if(h&&h.S&&h.S.hostPid===me&&Date.now()-h.ts<SAVE_TTL)return {role:'host',code:h.code,S:h.S};
+    const g=JSON.parse(store.get('skrynky:guest')||'null');
+    if(g&&g.code&&Date.now()-g.ts<SAVE_TTL)return {role:'guest',code:g.code};
+  }catch(e){}
+  return null;
+}
+function persist(){
+  if(isHost()&&S)store.set('skrynky:host',JSON.stringify({code:roomCode,S:S,ts:Date.now()}));
+}
+function showSaved(){
+  const sv=readSaved(),box=$('saved');
+  if(!sv){box.hidden=true;return}
+  $('saved-text').innerHTML=sv.role==='host'
+    ?'У вас є незавершена гра <b>'+esc(sv.code)+'</b>, де ви ведучий.'
+    :'Ви грали в кімнаті <b>'+esc(sv.code)+'</b>. Повернутися?';
+  box.hidden=false;
+}
+
+/* ---------- teardown ---------- */
 function teardown(){
-  if(unsubG){unsubG();unsubG=null}
-  if(unsubM){unsubM();unsubM=null}
-  clearTimeout(loadTimer);
+  clearTimeout(loadTimer);clearTimeout(reconnTimer);clearTimeout(retryTimer);clearTimeout(busyTimer);clearInterval(hbTimer);hbTimer=null;
+  try{if(hostConn)hostConn.close()}catch(e){}
+  Object.keys(conns).forEach(k=>{try{conns[k].close()}catch(e){}});
+  try{if(peer)peer.destroy()}catch(e){}
+  peer=null;conns={};hostConn=null;
+}
+function resetUi(){
+  G=null;S=null;role=null;roomCode=null;busy=false;selT=null;selR=null;prevTurn=null;prevAsks=-1;netDown=false;creating=false;attempts=0;
+  setNet('');
 }
 function leave(){
-  teardown();code=null;G=null;msgs=[];selT=null;selR=null;prevTurn=null;busy=false;
-  store.del('skrynky:last');
-  entryErr('');show('entry');
-}
-function enter(c){
+  if(role==='guest'&&hostConn&&hostConn.open&&G&&G.status==='lobby'){try{hostConn.send({t:'leave'})}catch(e){}}
   teardown();
-  code=c;store.set('skrynky:last',c);G=null;msgs=[];selT=null;selR=null;prevTurn=null;
-  show('loading');$('loading-note').textContent='';
-  loadTimer=setTimeout(()=>{if(!G)$('loading-note').textContent='Дані гри ще не отримано. Перевірте зʼєднання, ми продовжуємо спроби.'},10000);
-  unsubG=db.doc('games/'+c).onSnapshot(snap=>{
-    if(!snap.exists){
-      if(snap.metadata&&snap.metadata.fromCache)return;
-      leave();entryErr('Цієї гри не існує або її видалено.');return;
+  if(role==='host')store.del('skrynky:host');
+  store.del('skrynky:guest');
+  resetUi();
+  entryErr('');show('entry');showSaved();
+}
+function fail(msg){
+  teardown();store.del('skrynky:guest');
+  if(role==='host')store.del('skrynky:host');
+  resetUi();show('entry');showSaved();entryErr(msg);
+}
+function waitScreen(title){
+  show('loading');$('loading-title').textContent=title;$('loading-note').textContent='';
+  clearTimeout(loadTimer);
+  loadTimer=setTimeout(()=>{$('loading-note').textContent='Це триває довше, ніж зазвичай. Перевірте інтернет; ми продовжуємо спроби.'},12000);
+}
+
+/* ---------- host: owns the game, talks to every guest ---------- */
+function online(u){return u===me||!!(conns[u]&&conns[u].open)}
+function withOnline(v){
+  Object.keys(v.players).forEach(u=>{v.players[u].online=online(u)});
+  return v;
+}
+function broadcast(){
+  Object.keys(conns).forEach(pid=>{
+    const c=conns[pid];
+    if(c&&c.open){try{c.send({t:'state',view:withOnline(viewFor(S,pid))})}catch(e){}}
+  });
+}
+function hostChanged(){
+  persist();broadcast();
+  G=materialize(withOnline(viewFor(S,me)));
+  busy=false;clearTimeout(busyTimer);
+  onGame();
+}
+function hostHandle(pid,m){
+  let err=null;
+  switch(m&&m.t){
+    case 'ask':err=handleAsk(S,pid,m.to,m.rank);break;
+    case 'chat':handleChat(S,pid,m.text);break;
+    case 'skip':err=handleSkip(S,pid);break;
+    case 'start':err=pid===S.hostPid?startGameS(S):'Почати гру може лише ведучий.';break;
+    case 'again':
+      if(pid!==S.hostPid||S.status!=='done')err='Нову партію може почати лише ведучий після завершення гри.';
+      else backToLobby(S);
+      break;
+    default:err='Невідома дія.';
+  }
+  if(err){
+    if(pid===me){toast(err);busy=false;clearTimeout(busyTimer);if(G)onGame()}
+    else if(conns[pid]&&conns[pid].open){try{conns[pid].send({t:'err',msg:err})}catch(e){}}
+    return;
+  }
+  hostChanged();
+}
+function onGuestMsg(conn,m){
+  if(!m||typeof m!=='object')return;
+  conn.seen=Date.now();
+  if(m.t==='ping')return;
+  if(m.t==='join'){
+    const pid=String(m.pid||'');
+    if(!/^p[0-9a-z]{20}$/.test(pid)){try{conn.send({t:'err',msg:'Некоректний ідентифікатор гравця.',fatal:true})}catch(e){}return}
+    const err=addPlayer(S,pid,cleanName(m.name)||'Гравець');
+    if(err){try{conn.send({t:'err',msg:err,fatal:true})}catch(e){}return}
+    if(conns[pid]&&conns[pid]!==conn){try{conns[pid].close()}catch(e){}}
+    conns[pid]=conn;conn.pid=pid;
+    hostChanged();
+    return;
+  }
+  const pid=conn.pid;
+  if(!pid||conns[pid]!==conn)return;
+  if(m.t==='leave'){
+    if(S.status==='lobby'&&pid!==S.hostPid){delete S.players[pid];delete conns[pid];try{conn.close()}catch(e){}hostChanged()}
+    return;
+  }
+  if(m.t==='ask'||m.t==='chat')hostHandle(pid,m);
+}
+function onGuestClose(conn){
+  if(conn.pid&&conns[conn.pid]===conn){delete conns[conn.pid];if(S)hostChanged()}
+}
+function openHostPeer(code){
+  const p=new Peer(PEER_PREFIX+code);
+  peer=p;
+  p.on('open',()=>{
+    if(peer!==p)return;
+    roomCode=code;creating=false;
+    if(!S)S=newLobby(code,me,myName);
+    S.code=code;
+    persist();
+    hostChanged();
+  });
+  p.on('connection',conn=>{
+    conn.seen=Date.now();
+    conn.on('data',m=>onGuestMsg(conn,m));
+    conn.on('close',()=>onGuestClose(conn));
+    conn.on('error',()=>{});
+  });
+  p.on('disconnected',()=>{
+    if(peer!==p||p.destroyed)return;
+    clearTimeout(reconnTimer);
+    reconnTimer=setTimeout(function again(){
+      if(peer!==p||p.destroyed)return;
+      try{p.reconnect()}catch(e){}
+      reconnTimer=setTimeout(()=>{if(peer===p&&p.disconnected)again()},4000);
+    },1500);
+  });
+  p.on('error',err=>{
+    if(peer!==p)return;
+    if(err.type==='unavailable-id'){
+      try{p.destroy()}catch(e){}
+      attempts++;
+      if(creating){
+        if(attempts>8){fail('Не вдалося вигадати вільний код. Спробуйте ще раз.');return}
+        openHostPeer(genCode());
+      }else{
+        if(attempts>12){fail('Код '+code+' досі зайнятий попереднім з’єднанням. Зачекайте хвилину й спробуйте ще раз.');return}
+        $('loading-note').textContent='Чекаємо, поки сервер звільнить код '+code+'… (спроба '+attempts+')';
+        retryTimer=setTimeout(()=>{if(role==='host')openHostPeer(code)},3000);
+      }
+    }else if(err.type==='network'||err.type==='server-error'||err.type==='socket-error'||err.type==='socket-closed'){
+      if(!S||S.status==='lobby'&&!roomCode){fail('Не вдалося підключитися до сервера зв’язку. Перевірте інтернет і спробуйте ще раз.')}
+      else toast('Проблеми зі зв’язком із сервером. Нові гравці зможуть приєднатися, коли зв’язок відновиться.');
     }
+  });
+}
+function startHost(code,resumeS){
+  role='host';myName=resumeS?(resumeS.players[me]&&resumeS.players[me].name)||myName:myName;
+  S=resumeS||null;creating=!resumeS;attempts=0;
+  waitScreen(resumeS?'Відновлюємо гру '+code+'…':'Створюємо гру…');
+  startHeartbeat();
+  openHostPeer(code);
+}
+
+/* ---------- guest: only ever sees its own hand ---------- */
+function materialize(v){
+  const g={code:v.code,status:v.status,host:v.host,order:v.order||[],players:v.players||{},books:v.books||{},turn:v.turn,round:v.round||0,asks:v.asks||[],chat:v.chat||[]};
+  g.hands={};
+  g.order.forEach(u=>{g.hands[u]=u===me?(v.hand||[]):new Array((v.counts&&v.counts[u])||0).fill(0)});
+  g.deck=new Array(v.deckN||0).fill(0);
+  return g;
+}
+function onHostMsg(m){
+  if(!m||typeof m!=='object')return;
+  lastSeen=Date.now();
+  if(m.t==='ping')return;
+  if(m.t==='state'){
     clearTimeout(loadTimer);
-    G=snap.data();onGame();
-  },e=>{clearTimeout(loadTimer);toast(dbErr(e))});
-  unsubM=db.collection('games/'+c+'/msgs').orderBy('ts','desc').limit(80).onSnapshot(s=>{
-    msgs=s.docs.map(d=>d.data());
-    if(G&&G.status!=='lobby')renderFeed();
-  },()=>{});
+    G=materialize(m.view);
+    busy=false;clearTimeout(busyTimer);
+    store.set('skrynky:guest',JSON.stringify({code:roomCode,ts:Date.now()}));
+    onGame();
+  }else if(m.t==='err'){
+    if(m.fatal){fail(m.msg);return}
+    toast(m.msg);busy=false;clearTimeout(busyTimer);if(G)onGame();
+  }
 }
-async function createGame(){
-  if(busy)return;
-  const name=cleanName($('nick').value);
-  if(!name){entryErr('Введіть ім’я, щоб інші гравці бачили, хто ви.');return}
-  store.set('skrynky:nick',name);entryErr('');busy=true;
-  try{
-    for(let i=0;i<6;i++){
-      const c=genCode(),r=db.doc('games/'+c),s=await r.get();
-      if(s.exists)continue;
-      await r.set({code:c,host:me,status:'lobby',created:Date.now(),round:0,gid:newGid(),players:{[me]:{name:name,at:Date.now()}}});
-      busy=false;enter(c);return;
-    }
-    entryErr('Не вдалося вигадати вільний код. Спробуйте ще раз.');
-  }catch(e){entryErr(dbErr(e))}
-  busy=false;
+function dropHost(msg){
+  const c=hostConn;hostConn=null;
+  try{if(c)c.close()}catch(e){}
+  netDown=true;setNet(msg);
+  scheduleReconnect();
 }
-async function joinGame(){
-  if(busy)return;
-  const name=cleanName($('nick').value);
-  const c=($('code').value||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
-  if(!name){entryErr('Введіть ім’я, щоб інші гравці бачили, хто ви.');return}
-  if(c.length!==5){entryErr('Код складається з п’яти символів.');return}
-  store.set('skrynky:nick',name);entryErr('');busy=true;
-  try{
-    const r=db.doc('games/'+c),s=await r.get();
-    if(!s.exists){entryErr('Гри з таким кодом немає. Перевірте код.');busy=false;return}
-    const g=s.data();
-    if(!g.players||!g.players[me]){
-      if(g.status!=='lobby'){entryErr('Ця гра вже почалась.');busy=false;return}
-      if(Object.keys(g.players||{}).length>=6){entryErr('У грі вже шестеро гравців.');busy=false;return}
-      await r.update({players:{[me]:{name:name,at:Date.now()}}});
+function startHeartbeat(){
+  clearInterval(hbTimer);
+  hbTimer=setInterval(()=>{
+    const now=Date.now();
+    if(role==='host'){
+      Object.keys(conns).forEach(pid=>{
+        const c=conns[pid];
+        if(!c||!c.open)return;
+        if(now-(c.seen||0)>25000){try{c.close()}catch(e){}return}
+        try{c.send({t:'ping'})}catch(e){}
+      });
+    }else if(role==='guest'){
+      const c=hostConn;
+      if(c&&c.open){
+        if(now-lastSeen>25000){dropHost('Зв’язок із ведучим втрачено. Перепідключаємось…');return}
+        try{c.send({t:'ping'})}catch(e){}
+      }
     }
-    busy=false;enter(c);return;
-  }catch(e){entryErr(dbErr(e))}
-  busy=false;
+  },8000);
+}
+function scheduleReconnect(){
+  clearTimeout(reconnTimer);
+  reconnTimer=setTimeout(()=>{
+    if(role!=='guest'||!peer)return;
+    if(peer.destroyed){openGuestPeer();return}
+    if(peer.disconnected){try{peer.reconnect()}catch(e){}}
+    connectToHost();
+  },3000);
+}
+function connectToHost(){
+  if(role!=='guest'||!peer||peer.destroyed)return;
+  const c=peer.connect(PEER_PREFIX+roomCode,{reliable:true,serialization:'json'});
+  hostConn=c;
+  setTimeout(()=>{if(hostConn===c&&!c.open&&role==='guest')dropHost('Не вдається з’єднатися з ведучим. Повторюємо спроби…')},10000);
+  c.on('open',()=>{
+    if(hostConn!==c)return;
+    lastSeen=Date.now();
+    netDown=false;setNet('');clearTimeout(reconnTimer);
+    c.send({t:'join',pid:me,name:myName});
+  });
+  c.on('data',onHostMsg);
+  c.on('close',()=>{
+    if(hostConn!==c||role!=='guest')return;
+    netDown=true;setNet('Зв’язок із ведучим втрачено. Перепідключаємось…');
+    scheduleReconnect();
+  });
+  c.on('error',()=>{});
+}
+function openGuestPeer(){
+  const p=new Peer();
+  peer=p;
+  p.on('open',()=>{if(peer===p)connectToHost()});
+  p.on('disconnected',()=>{if(peer===p&&!p.destroyed){try{p.reconnect()}catch(e){}}});
+  p.on('error',err=>{
+    if(peer!==p)return;
+    if(err.type==='peer-unavailable'){
+      if(!G){fail('Гри з таким кодом немає, або ведучий уже закрив вкладку. Перевірте код.');return}
+      netDown=true;setNet('Ведучого зараз немає в мережі. Чекаємо, поки він повернеться…');
+      scheduleReconnect();
+    }else if(err.type==='network'||err.type==='server-error'||err.type==='socket-error'||err.type==='socket-closed'){
+      if(!G){fail('Не вдалося підключитися до сервера зв’язку. Перевірте інтернет і спробуйте ще раз.')}
+      else{netDown=true;setNet('Проблеми зі зв’язком. Перепідключаємось…');scheduleReconnect()}
+    }
+  });
+}
+function startGuest(code){
+  role='guest';roomCode=code;
+  waitScreen('Підключаємося до гри '+code+'…');
+  startHeartbeat();
+  openGuestPeer();
 }
 
-/* ---------- reacting to game state ---------- */
-function onGame(){
-  if(!G)return;
-  if(G.status==='lobby'){show('lobby');renderLobby();return}
-  show('game');
-  if(G.turn!==prevTurn){prevTurn=G.turn;selT=null;selR=null}
-  renderGame();
+/* ---------- actions from this screen ---------- */
+function act(m){
+  if(isHost()){hostHandle(me,m);return}
+  if(hostConn&&hostConn.open){try{hostConn.send(m)}catch(e){toast('Не вдалося надіслати. Спробуйте ще раз.')}}
+  else toast('Зв’язок із ведучим втрачено. Зачекайте на перепідключення.');
 }
-function renderLobby(){
-  $('lobby-code').textContent=code;
-  const ids=Object.keys(G.players).sort((a,b)=>G.players[a].at-G.players[b].at);
-  $('lobby-count').textContent='Гравці: '+ids.length+' з 6';
-  $('lobby-players').innerHTML=ids.map((u,i)=>
-    '<li class="lp" style="--pc:var(--p'+(i%6)+')"><span class="av">'+esc(initial(G.players[u].name))+'</span><span class="nm">'+esc(G.players[u].name)+'</span>'+
-    (u===G.host?'<span class="tag">ведучий</span>':'')+(u===me?'<span class="tag">ви</span>':'')+'</li>').join('');
-  const host=G.host===me,per=4;
-  $('lobby-actions').innerHTML=
-    (host
-      ?'<button class="btn" type="button" data-act="start"'+(ids.length<2||busy?' disabled':'')+'>Почати гру</button>'+
-        '<p class="muted">'+(ids.length<2?'Потрібно щонайменше двоє гравців.':'Кожен отримає по '+per+' карт.')+'</p>'
-      :'<p class="muted">Чекаємо, поки ведучий почне гру.</p>')+
-    '<button class="btn ghost" type="button" data-act="leave">Вийти</button>';
-}
-async function startGame(){
-  if(busy)return;
-  busy=true;renderLobby();
-  try{
-    const s=await ref().get(),g=s.data();
-    if(!g||g.status!=='lobby'||g.host!==me){busy=false;return}
-    const ids=Object.keys(g.players).sort((a,b)=>g.players[a].at-g.players[b].at).slice(0,6);
-    if(ids.length<2){busy=false;renderLobby();return}
-    const d=dealGame(ids);
-    await ref().update({status:'play',order:d.order,hands:d.hands,books:d.books,deck:d.deck,turn:d.order[0],round:1,asks:[],gid:newGid()});
-    clearMsgs();
-  }catch(e){toast(dbErr(e))}
-  busy=false;if(G)onGame();
-}
-async function clearMsgs(){
-  try{
-    const path='games/'+code+'/msgs',q=await db.collection(path).get();
-    for(const d of q.docs){await db.doc(path+'/'+d.id).delete()}
-  }catch(e){}
-}
-async function pruneMsgs(round){
-  try{
-    const path='games/'+code+'/msgs',q=await db.collection(path).where('r','<',round-1).get();
-    for(const d of q.docs){await db.doc(path+'/'+d.id).delete()}
-  }catch(e){}
-}
-async function again(){
-  if(busy||!G||G.host!==me)return;
-  busy=true;renderGame();
-  try{
-    await ref().set({code:G.code,host:G.host,status:'lobby',created:G.created,players:G.players,round:0,gid:newGid()});
-    clearMsgs();
-  }catch(e){toast(dbErr(e))}
-  busy=false;if(G)onGame();
-}
-
-/* ---------- turns ---------- */
 function validTargets(){
   return (G.order||[]).filter(u=>u!==me&&(G.deck.length>0||(G.hands[u]||[]).length>0));
 }
-async function doAsk(){
+function doAsk(){
   if(busy||!isMyTurn()||selT==null||selR==null)return;
   if(!canAsk(G,me,selT,selR))return;
   busy=true;renderGame();
-  try{
-    const res=applyAsk(G,me,selT,selR);
-    await ref().update(res.patch);
-    selT=null;selR=null;
-    if(res.roundChanged)pruneMsgs(res.patch.round);
-  }catch(e){toast(dbErr(e))}
-  busy=false;if(G)renderGame();
+  clearTimeout(busyTimer);
+  busyTimer=setTimeout(()=>{busy=false;if(G)renderGame()},5000);
+  act({t:'ask',to:selT,rank:selR});
 }
-async function skipTurn(){
-  if(busy||!G||G.status!=='play'||G.host!==me||G.turn===me)return;
-  busy=true;renderGame();
-  try{
-    const res=applySkip(G);
-    await ref().update(res.patch);
-    if(res.roundChanged)pruneMsgs(res.patch.round);
-  }catch(e){toast(dbErr(e))}
-  busy=false;if(G)renderGame();
-}
+function skipTurn(){if(isHost()&&G&&G.status==='play'&&G.turn!==me)act({t:'skip'})}
+function startGameAct(){if(isHost())act({t:'start'})}
+function againAct(){if(isHost())act({t:'again'})}
 function pickTarget(u){
   if(busy||!isMyTurn())return;
   selT=selT===u?null:u;renderGame();
@@ -598,7 +832,62 @@ function pickRank(r){
   selR=selR===r?null:r;renderGame();
 }
 
-/* ---------- rendering the game ---------- */
+/* ---------- entering ---------- */
+function createGame(){
+  const name=cleanName($('nick').value);
+  if(!name){entryErr('Введіть ім’я, щоб інші гравці бачили, хто ви.');return}
+  if(typeof Peer==='undefined'){entryErr('Не вдалося завантажити бібліотеку зв’язку. Перевірте інтернет чи блокувальник реклами й оновіть сторінку.');return}
+  store.set('skrynky:nick',name);entryErr('');myName=name;
+  store.del('skrynky:guest');
+  startHost(genCode(),null);
+}
+function joinGame(){
+  const name=cleanName($('nick').value);
+  const c=($('code').value||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(!name){entryErr('Введіть ім’я, щоб інші гравці бачили, хто ви.');return}
+  if(c.length!==5){entryErr('Код складається з п’яти символів.');return}
+  if(typeof Peer==='undefined'){entryErr('Не вдалося завантажити бібліотеку зв’язку. Перевірте інтернет чи блокувальник реклами й оновіть сторінку.');return}
+  store.set('skrynky:nick',name);entryErr('');myName=name;
+  store.del('skrynky:host');
+  startGuest(c);
+}
+function resumeSaved(){
+  const sv=readSaved();
+  if(!sv)return;
+  if(typeof Peer==='undefined'){entryErr('Не вдалося завантажити бібліотеку зв’язку. Оновіть сторінку.');return}
+  myName=cleanName($('nick').value)||store.get('skrynky:nick')||'Гравець';
+  entryErr('');
+  if(sv.role==='host'){
+    sv.S.status=sv.S.status||'lobby';
+    roomCode=sv.code;startHost(sv.code,sv.S);
+  }else{startGuest(sv.code)}
+}
+
+/* ---------- rendering ---------- */
+function onGame(){
+  if(!G)return;
+  if(G.status==='lobby'){show('lobby');renderLobby();return}
+  show('game');
+  if(G.turn!==prevTurn){prevTurn=G.turn;selT=null;selR=null}
+  if(G.asks.length!==prevAsks){prevAsks=G.asks.length;selT=null;selR=null}
+  renderGame();
+}
+function renderLobby(){
+  $('lobby-code').textContent=roomCode;
+  const ids=Object.keys(G.players).sort((a,b)=>G.players[a].at-G.players[b].at);
+  $('lobby-count').textContent='Гравці: '+ids.length+' з 6';
+  $('lobby-players').innerHTML=ids.map((u,i)=>
+    '<li class="lp" style="--pc:var(--p'+(i%6)+')"><span class="av">'+esc(initial(G.players[u].name))+'</span><span class="nm">'+esc(G.players[u].name)+'</span>'+
+    (u===G.host?'<span class="tag">ведучий</span>':'')+(u===me?'<span class="tag">ви</span>':'')+
+    (G.players[u].online===false?'<span class="tag off">поза мережею</span>':'')+'</li>').join('');
+  const host=isHost();
+  $('lobby-actions').innerHTML=
+    (host
+      ?'<button class="btn" type="button" data-act="start"'+(ids.length<2?' disabled':'')+'>Почати гру</button>'+
+        '<p class="muted">'+(ids.length<2?'Потрібно щонайменше двоє гравців.':'Кожен отримає по 4 карти.')+'</p>'
+      :'<p class="muted">Чекаємо, поки ведучий почне гру.</p>')+
+    '<button class="btn ghost" type="button" data-act="leave">'+(host?'Закрити гру':'Вийти')+'</button>';
+}
 function playerHTML(u,myTurn){
   const n=(G.hands[u]||[]).length,books=G.books[u]||[];
   const turn=G.status==='play'&&G.turn===u;
@@ -608,7 +897,8 @@ function playerHTML(u,myTurn){
   const chests=books.map(r=>'<span class="chest" title="Скринька: '+RANK_NAMES[r]+'">'+CHEST+'<b>'+RANKS[r]+'</b></span>').join('');
   const inner=
     '<span class="plh"><span class="av">'+esc(initial(nm(u)))+'</span><span class="nm">'+esc(nm(u))+'</span>'+
-      (u===me?'<span class="tag">ви</span>':'')+(turn?'<span class="pill-turn">ходить</span>':'')+'</span>'+
+      (u===me?'<span class="tag">ви</span>':'')+(G.players[u]&&G.players[u].online===false?'<span class="tag off">поза мережею</span>':'')+
+      (turn?'<span class="pill-turn">ходить</span>':'')+'</span>'+
     '<span class="plc">'+fan+'<span class="cnt"><b>'+n+'</b>'+plural(n,['карта','карти','карт'])+'</span></span>'+
     '<span class="books">'+(chests||'<span class="nobook">скриньок ще нема</span>')+'</span>';
   const cls='pl'+(turn?' turn':'')+(sel?' sel':'')+(can?' pick':'');
@@ -658,16 +948,16 @@ function handHTML(myTurn){
   }).join('');
 }
 function actionHTML(myTurn,isPlayer){
-  const leaveBtn='<button class="btn ghost sm" type="button" data-act="leave">Вийти з гри</button>';
+  const leaveBtn='<button class="btn ghost sm" type="button" data-act="leave">'+(isHost()?'Закрити гру':'Вийти з гри')+'</button>';
   if(G.status==='done'){
-    return G.host===me
-      ?'<button class="btn" type="button" data-act="again"'+(busy?' disabled':'')+'>Нова партія</button>'+leaveBtn
+    return isHost()
+      ?'<button class="btn" type="button" data-act="again">Нова партія</button>'+leaveBtn
       :'<p class="muted">Чекаємо, поки ведучий почне нову партію.</p>'+leaveBtn;
   }
   if(!isPlayer)return '<p class="muted">Ви спостерігаєте за грою.</p>'+leaveBtn;
   if(!myTurn){
     return '<div class="wait"><span class="dot" aria-hidden="true"></span><span>Ходить <b>'+esc(nm(G.turn))+'</b></span></div>'+
-      (G.host===me?'<button class="btn ghost sm" type="button" data-act="skip"'+(busy?' disabled':'')+'>Пропустити його хід</button>':'');
+      (isHost()?'<button class="btn ghost sm" type="button" data-act="skip">Пропустити його хід</button>':'');
   }
   const ready=selT!=null&&selR!=null&&canAsk(G,me,selT,selR);
   return '<div class="steps">'+
@@ -684,14 +974,16 @@ function renderGame(){
     if(selT==null&&t.length===1)selT=t[0];
     if(selR!=null&&!(G.hands[me]||[]).some(c=>rankOf(c)===selR))selR=null;
   }else{selT=null;selR=null}
-  $('g-code').textContent=code;
+  $('g-code').textContent=roomCode;
   $('g-deck').textContent=G.deck.length;
   $('g-round').textContent=G.round;
-  $('g-books').textContent=order.reduce((s,u)=>s+(G.books[u]||[]).length,0)+'/13';
+  $('g-books').textContent=order.reduce((s,u)=>s+(G.books[u]||[]).length,0)+'/'+NBOOKS;
+  $('btn-leave-game').textContent=isHost()?'Закрити гру':'Вийти';
   $('players').innerHTML=order.map(u=>playerHTML(u,myTurn)).join('');
   $('banner').innerHTML=bannerHTML();
   $('hand-wrap').hidden=!isPlayer;
-  $('hand-count').textContent=(G.hands[me]||[]).length+' '+plural((G.hands[me]||[]).length,['карта','карти','карт']);
+  const hn=(G.hands[me]||[]).length;
+  $('hand-count').textContent=hn+' '+plural(hn,['карта','карти','карт']);
   $('hand').innerHTML=handHTML(myTurn);
   $('action').innerHTML=actionHTML(myTurn,isPlayer);
   renderFeed();
@@ -705,7 +997,7 @@ function renderFeed(){
   if(!box||!G||G.status==='lobby')return;
   const min=(G.round||0)-1,items=[];
   (G.asks||[]).forEach(a=>{if(a.r>=min)items.push({r:a.r,ts:a.ts,h:'<div class="ev">'+askInner(a)+'</div>'})});
-  msgs.forEach(m=>{if(m.g===G.gid&&m.r>=min)items.push({r:m.r,ts:m.ts,h:msgHTML(m)})});
+  (G.chat||[]).forEach(m=>{if(m.r>=min)items.push({r:m.r,ts:m.ts,h:msgHTML(m)})});
   items.sort((a,b)=>a.r-b.r||a.ts-b.ts);
   const near=box.scrollHeight-box.scrollTop-box.clientHeight<60;
   let html='',last=null;
@@ -719,12 +1011,14 @@ function renderFeed(){
 
 /* ---------- events ---------- */
 async function copyCode(){
-  try{await navigator.clipboard.writeText(code);toast('Код скопійовано: '+code)}
-  catch(e){toast('Код гри: '+code)}
+  try{await navigator.clipboard.writeText(roomCode);toast('Код скопійовано: '+roomCode)}
+  catch(e){toast('Код гри: '+roomCode)}
 }
 function bind(){
   $('btn-create').addEventListener('click',createGame);
   $('btn-join').addEventListener('click',joinGame);
+  $('btn-resume').addEventListener('click',resumeSaved);
+  $('btn-forget').addEventListener('click',()=>{store.del('skrynky:host');store.del('skrynky:guest');showSaved()});
   $('code').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'')});
   $('code').addEventListener('keydown',e=>{if(e.key==='Enter')joinGame()});
   $('nick').addEventListener('keydown',e=>{if(e.key==='Enter')($('code').value?joinGame():createGame())});
@@ -733,54 +1027,30 @@ function bind(){
     if(!el)return;
     if(el.dataset.pick){pickTarget(el.dataset.pick);return}
     if(el.dataset.rank!==undefined){pickRank(+el.dataset.rank);return}
-    const act=el.dataset.act;
-    if(act==='leave')leave();
-    else if(act==='copy')copyCode();
-    else if(act==='start')startGame();
-    else if(act==='ask')doAsk();
-    else if(act==='skip')skipTurn();
-    else if(act==='again')again();
+    const a=el.dataset.act;
+    if(a==='leave')leave();
+    else if(a==='copy')copyCode();
+    else if(a==='start')startGameAct();
+    else if(a==='ask')doAsk();
+    else if(a==='skip')skipTurn();
+    else if(a==='again')againAct();
   });
-  $('chat-form').addEventListener('submit',async e=>{
+  $('chat-form').addEventListener('submit',e=>{
     e.preventDefault();
     const input=$('chat-input'),t=input.value.trim().slice(0,200);
     if(!t||!G||G.status==='lobby')return;
     input.value='';
-    try{await db.collection('games/'+code+'/msgs').add({u:me,t:t,ts:Date.now(),r:G.round,g:G.gid})}
-    catch(err){toast(dbErr(err));input.value=t}
+    act({t:'chat',text:t});
   });
 }
 
-async function init(){
-  $('nick').value=store.get('skrynky:nick')||'';
-  bind();
-  if(!(window.claude&&window.claude.use)){
-    entryErr('Гра працює лише всередині Claude: відкрийте її за посиланням на артефакт.');lockEntry();return;
-  }
-  let user=null;
-  try{
-    const r=await Promise.all([window.claude.use('db'),window.claude.use('user')]);
-    db=r[0];user=r[1];
-    if(db&&user)me=await user.id();
-  }catch(e){}
-  if(!db||!user||!me){
-    entryErr('Щоб грати разом, увійдіть в акаунт Claude й відкрийте гру знову. Без входу сховище гри недоступне.');lockEntry();return;
-  }
-  const cw=await user.can('data.write');
-  if(cw===false){
-    entryErr('У вас доступ лише для перегляду. Попросіть власника гри дати вам права «Учасник».');lockEntry();return;
-  }
-  const last=store.get('skrynky:last');
-  if(last){
-    try{
-      const s=await db.doc('games/'+last).get();
-      if(s.exists&&s.data().players&&s.data().players[me]){enter(last);return}
-    }catch(e){}
-    store.del('skrynky:last');
-  }
+$('nick').value=store.get('skrynky:nick')||'';
+bind();
+showSaved();
+if(typeof Peer==='undefined'){
+  entryErr('Не вдалося завантажити бібліотеку зв’язку (PeerJS). Перевірте інтернет чи блокувальник реклами й оновіть сторінку.');
 }
-init();
 })();
 </script>
-
-</body></html>
+</body>
+</html>
