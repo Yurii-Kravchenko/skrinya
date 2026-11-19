@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Скриньки</title>
-<meta name="description" content="Карткова гра «Скриньки» на 54 карти для 2–6 гравців. Заходьте за кодом гри просто з браузера.">
+<title>Скриньки і Пеньки</title>
+<meta name="description" content="Карткові ігри «Скриньки» і «Пеньки» для 2–6 гравців. Заходьте за кодом гри просто з браузера.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@700&family=Unbounded:wght@600;700&display=swap">
 <style>
 /* Layout: one column on phones (table, last ask, hand, sticky action bar, chat); from 900px the chat becomes a sticky right column. */
@@ -225,6 +225,32 @@ button.grp:hover{transform:translateY(-4px)}
   .chat{position:sticky;top:16px;height:calc(100vh - 32px);max-height:700px}
 }
 
+
+/* tabs and the second game */
+.tabs{display:flex;gap:6px;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.tab{flex:1;padding:10px 12px;border:0;border-radius:9px;background:transparent;font-weight:800;cursor:pointer;color:var(--muted)}
+.tab.on{background:var(--accent);color:var(--on-accent)}
+.dnrow{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--table-muted);min-height:34px}
+.dslot{display:block;width:22px;height:32px;border-radius:4px;border:2px solid var(--card);background:repeating-linear-gradient(45deg,var(--back-1) 0 4px,var(--back-2) 4px 8px)}
+.pl.out{opacity:.55}
+.pile{display:flex;align-items:center;min-height:92px;padding:4px 2px}
+.pile .card+.card{margin-left:-30px}
+.pile .card:last-child{box-shadow:0 0 0 3px var(--turn),0 2px 6px rgba(0,0,0,.3)}
+.pile.empty{color:var(--muted);border:2px dashed var(--line);border-radius:10px;justify-content:center;min-height:84px}
+.pcenter{display:grid;gap:8px}
+.pcenter .need{font-weight:700}
+.pcard{display:inline-flex;padding:3px;border:2px solid transparent;border-radius:10px;background:none;transition:transform .12s}
+button.pcard{cursor:pointer}
+button.pcard:hover{transform:translateY(-5px)}
+.pcard.dim{opacity:.38}
+.pcard.ok{border-color:color-mix(in srgb,var(--ok) 70%,transparent)}
+.pdown{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:6px 2px;min-height:90px}
+.dback{display:inline-block;width:54px;height:78px;border-radius:7px;border:2px solid var(--card);background:repeating-linear-gradient(45deg,var(--back-1) 0 5px,var(--back-2) 5px 10px);padding:0}
+button.dback{cursor:pointer}
+button.dback:hover{transform:translateY(-5px)}
+.dback.act{box-shadow:0 0 0 3px var(--turn)}
+.dlabel{font-size:12px;color:var(--muted)}
+
 .toast{
   position:fixed;left:50%;transform:translateX(-50%);bottom:calc(88px + env(safe-area-inset-bottom,0px));
   max-width:min(92vw,420px);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;z-index:20;text-align:center;
@@ -239,14 +265,18 @@ button.grp:hover{transform:translateY(-4px)}
 <main class="wrap">
 
   <section id="screen-entry" class="entry">
+    <div class="tabs" role="tablist" aria-label="Гра">
+      <button id="tab-skrynky" class="tab on" type="button" role="tab" data-tab="skrynky">Скриньки</button>
+      <button id="tab-penky" class="tab" type="button" role="tab" data-tab="penky">Пеньки</button>
+    </div>
     <div class="hero">
       <div class="deco" aria-hidden="true">
         <span class="card red c1" data-s="♥"><b>К</b><i>♥</i></span>
         <span class="card c2" data-s="♠"><b>Д</b><i>♠</i></span>
         <span class="card red c3" data-s="♦"><b>Т</b><i>♦</i></span>
       </div>
-      <h1>Скриньки</h1>
-      <p class="lead">Карткова гра на 54 карти для 2–6 гравців. Питайте карти один в одного й збирайте скриньки: чотири однакові карти або двоє джокерів.</p>
+      <h1 id="hero-title">Скриньки</h1>
+      <p id="hero-lead" class="lead">Карткова гра на 54 карти для 2–6 гравців. Питайте карти один в одного й збирайте скриньки: чотири однакові карти або двоє джокерів.</p>
     </div>
     <div id="saved" class="panel saved" hidden>
       <p id="saved-text"></p>
@@ -267,7 +297,7 @@ button.grp:hover{transform:translateY(-4px)}
       </div>
       <p id="entry-err" class="err" role="alert" hidden></p>
     </div>
-    <details class="rules">
+    <details id="rules-skrynky" class="rules">
       <summary>Правила</summary>
       <ul>
         <li>У колоді 54 карти: 52 звичайні й 2 джокери. Кожен гравець отримує по 4 карти, скільки б не було гравців.</li>
@@ -280,6 +310,20 @@ button.grp:hover{transform:translateY(-4px)}
         <li>Скринька: чотири карти одного рангу або двоє джокерів. Їх викладають на стіл.</li>
         <li>Гра закінчується, коли викладено всі 14 скриньок. Перемагає той, у кого їх більше.</li>
         <li>Чат запам’ятовує запити за два останні кола: хто в кого й що питав.</li>
+      </ul>
+    </details>
+    <details id="rules-penky" class="rules" hidden>
+      <summary>Правила</summary>
+      <ul>
+        <li>Колода з 52 карт, без джокерів. Кожен гравець отримує 2 закриті карти (сорочкою догори) і 3 карти в руку. Поки є колода, рука поповнюється до трьох.</li>
+        <li>Першого гравця обирає гра навмання, далі ходять по колу. На центральну стопку кладуть карту рівну або вищу за верхню (туз найвищий). На порожню стопку можна класти будь-яку.</li>
+        <li>Двійка кладеться на будь-яку карту й обнуляє стопку: на неї можна класти що завгодно.</li>
+        <li>Десятка кладеться на будь-яку карту й «спалює» всю центральну стопку у відбій.</li>
+        <li>Чотири однакові карти поспіль зверху теж спалюють стопку.</li>
+        <li>Якщо жодна карта в руці не підходить, гравець забирає всю стопку собі в руку.</li>
+        <li>Коли в руці й колоді карт нема, граються закриті: відкривається одна наосліп. Якщо вона не підходить, гравець забирає стопку разом із нею.</li>
+        <li>Хто позбувся всіх карт, виходить із гри. Програє останній, у кого лишилися карти.</li>
+        <li>Ведучий може пропустити хід гравця, який завис.</li>
       </ul>
     </details>
   </section>
@@ -295,7 +339,7 @@ button.grp:hover{transform:translateY(-4px)}
   <section id="screen-lobby" class="lobby" hidden>
     <div id="net-lobby" class="net" hidden></div>
     <div class="panel stack">
-      <p class="eyebrow">Код гри</p>
+      <p id="lobby-eyebrow" class="eyebrow">Код гри</p>
       <div class="codebox">
         <span id="lobby-code" class="code"></span>
         <button class="btn ghost" type="button" data-act="copy">Скопіювати</button>
@@ -336,6 +380,38 @@ button.grp:hover{transform:translateY(-4px)}
         <div id="feed" class="feed" aria-live="polite"></div>
         <form id="chat-form" class="chat-form">
           <input id="chat-input" maxlength="200" autocomplete="off" placeholder="Повідомлення…" aria-label="Повідомлення">
+          <button class="btn sm" type="submit">Надіслати</button>
+        </form>
+      </aside>
+    </div>
+  </section>
+
+  <section id="screen-penky" hidden>
+    <div class="layout">
+      <div class="main">
+        <div id="net-penky" class="net" hidden></div>
+        <div class="table">
+          <div class="stats">
+            <div class="st"><span class="eyebrow">Код</span><b id="p-code"></b></div>
+            <div class="st"><span class="eyebrow">Колода</span><b id="p-deck"></b></div>
+            <div class="st"><span class="eyebrow">Відбій</span><b id="p-burn"></b></div>
+            <button class="btn ghost sm" type="button" data-act="leave" id="btn-leave-penky">Вийти</button>
+          </div>
+          <div id="p-players" class="players"></div>
+        </div>
+        <div id="p-center" class="panel pcenter"></div>
+        <div id="p-mine" class="panel">
+          <div class="hand-head"><span class="eyebrow">Ваші карти</span><span id="p-hand-count" class="muted"></span></div>
+          <div id="p-down" class="pdown"></div>
+          <div id="p-hand" class="hand"></div>
+        </div>
+        <div id="p-action" class="action"></div>
+      </div>
+      <aside class="panel chat" aria-label="Журнал і чат">
+        <div class="chat-head"><h2>Журнал і чат</h2><span class="mem">ходи гри</span></div>
+        <div id="pfeed" class="feed" aria-live="polite"></div>
+        <form id="pchat-form" class="chat-form">
+          <input id="pchat-input" maxlength="200" autocomplete="off" placeholder="Повідомлення…" aria-label="Повідомлення">
           <button class="btn sm" type="submit">Надіслати</button>
         </form>
       </aside>
@@ -426,7 +502,7 @@ function dealGame(ids,fixedDeck){
 /* ---- host-side game state: the host's browser is the only place that holds every hand ---- */
 function newLobby(code,hostPid,name){
   const p={};p[hostPid]={name:name,at:Date.now()};
-  return {ver:2,code:code,hostPid:hostPid,status:'lobby',created:Date.now(),players:p,order:[],hands:{},books:{},deck:[],turn:null,round:0,asks:[],chat:[],priv:{},pend:null};
+  return {ver:2,game:'skrynky',code:code,hostPid:hostPid,status:'lobby',created:Date.now(),players:p,order:[],hands:{},books:{},deck:[],turn:null,round:0,asks:[],chat:[],priv:{},pend:null};
 }
 function addPlayer(S,pid,name){
   if(S.players[pid])return null;
@@ -517,18 +593,127 @@ function viewFor(S,pid){
   const counts={},players={};
   (S.order||[]).forEach(u=>{counts[u]=(S.hands[u]||[]).length});
   Object.keys(S.players).forEach(u=>{players[u]={name:S.players[u].name,at:S.players[u].at}});
-  return {code:S.code,status:S.status,host:S.hostPid,order:S.order,players:players,counts:counts,books:S.books,
+  return {game:'skrynky',code:S.code,status:S.status,host:S.hostPid,order:S.order,players:players,counts:counts,books:S.books,
     deckN:S.deck.length,turn:S.turn,round:S.round,asks:S.asks,chat:S.chat.filter(m=>m.r>=S.round-1),
     pend:S.pend?{f:S.pend.f,t:S.pend.t,k:S.pend.k,stage:S.pend.stage}:null,
     priv:(S.priv[pid]||[]).filter(p=>p.r>=S.round-1),hand:(S.hands[pid]||[]).slice()};
 }
+
+/* ---- «Пеньки»: 52 cards, 2 face-down + 3 in hand, a 2 resets, a 10 and four-of-a-kind burn the pile ---- */
+const pVal=c=>{const r=c%13;return r===0?14:r+1};        // 2 lowest ... K=13, A=14 (the ace is high)
+function pLegal(pile,c){
+  const r=c%13;
+  if(r===1||r===9)return true;                            // 2 and 10 go on anything
+  if(!pile.length)return true;
+  const t=pile[pile.length-1];
+  if(t%13===1)return true;                                // a 2 on top: anything goes
+  return pVal(c)>=pVal(t);
+}
+function penkyLobby(code,hostPid,name){
+  const p={};p[hostPid]={name:name,at:Date.now()};
+  return {ver:2,game:'penky',code:code,hostPid:hostPid,status:'lobby',created:Date.now(),players:p,order:[],hand:{},down:{},deck:[],pile:[],burned:0,turn:null,out:[],loser:null,log:[],chat:[]};
+}
+function penkyLog(S,e){e.ts=Date.now();S.log.push(e);if(S.log.length>80)S.log.splice(0,S.log.length-80)}
+function penkyStart(S){
+  if(S.status!=='lobby')return 'Гра вже йде.';
+  const ids=Object.keys(S.players).sort((a,b)=>S.players[a].at-S.players[b].at).slice(0,6);
+  if(ids.length<2)return 'Потрібно щонайменше двоє гравців.';
+  const deck=shuffle(Array.from({length:52},(_,i)=>i)),order=shuffle(ids),hand={},down={};
+  order.forEach(u=>{down[u]=[deck.pop(),deck.pop()];hand[u]=[]});
+  for(let i=0;i<3;i++)order.forEach(u=>hand[u].push(deck.pop()));
+  Object.assign(S,{status:'play',order:order,hand:hand,down:down,deck:deck,pile:[],burned:0,turn:order[0],out:[],loser:null,log:[],chat:[]});
+  return null;
+}
+function pRefill(S,u){while(S.hand[u].length<3&&S.deck.length)S.hand[u].push(S.deck.pop())}
+// puts a card on the pile and applies the special cards; returns the effect name or null
+function pPlace(S,c){
+  S.pile.push(c);
+  const r=c%13;
+  if(r===9){S.burned+=S.pile.length;S.pile=[];return 'burn10'}
+  if(S.pile.length>=4&&S.pile.slice(-4).every(x=>x%13===r)){S.burned+=S.pile.length;S.pile=[];return 'four'}
+  return r===1?'reset':null;
+}
+function pNextActive(S,from){
+  const i=S.order.indexOf(from);
+  for(let k=1;k<=S.order.length;k++){const w=S.order[(i+k)%S.order.length];if(S.out.indexOf(w)<0)return w}
+  return null;
+}
+// called after a player has acted: records an exit, ends the game, or passes the turn
+function pFinishTurn(S,u){
+  if(!S.hand[u].length&&!S.down[u].length&&S.out.indexOf(u)<0){S.out.push(u);penkyLog(S,{k:'out',f:u,p:S.out.length})}
+  const act=S.order.filter(x=>S.out.indexOf(x)<0);
+  if(act.length<=1){S.loser=act[0]||null;S.status='done';S.turn=null;return}
+  S.turn=pNextActive(S,u);
+}
+function penkyPlay(S,pid,card){
+  if(S.status!=='play'||S.turn!==pid)return 'Зараз не ваш хід.';
+  if(!Number.isInteger(card)||S.hand[pid].indexOf(card)<0)return 'У вас немає такої карти.';
+  if(!pLegal(S.pile,card))return 'Цю карту зараз покласти не можна.';
+  S.hand[pid].splice(S.hand[pid].indexOf(card),1);
+  const fx=pPlace(S,card);
+  penkyLog(S,{k:'play',f:pid,c:card,fx:fx});
+  pRefill(S,pid);
+  pFinishTurn(S,pid);
+  return null;
+}
+function penkyTake(S,pid){
+  if(S.status!=='play'||S.turn!==pid)return 'Зараз не ваш хід.';
+  if(!S.pile.length)return 'Стопка порожня.';
+  if(!S.hand[pid].length)return 'У вас немає карт у руці: відкрийте закриту карту.';
+  if(S.hand[pid].some(c=>pLegal(S.pile,c)))return 'У вас є карта, яку можна покласти.';
+  const n=S.pile.length;
+  S.hand[pid]=S.hand[pid].concat(S.pile);S.pile=[];
+  penkyLog(S,{k:'take',f:pid,n:n});
+  pFinishTurn(S,pid);
+  return null;
+}
+function penkyDown(S,pid,idx){
+  if(S.status!=='play'||S.turn!==pid)return 'Зараз не ваш хід.';
+  if(S.hand[pid].length||S.deck.length)return 'Закриті карти грають, коли рука й колода порожні.';
+  if(!Number.isInteger(idx)||idx<0||idx>=S.down[pid].length)return 'Немає такої закритої карти.';
+  const c=S.down[pid].splice(idx,1)[0];
+  if(pLegal(S.pile,c)){
+    const fx=pPlace(S,c);
+    penkyLog(S,{k:'down',f:pid,c:c,ok:1,fx:fx});
+  }else{
+    const n=S.pile.length;
+    S.hand[pid]=S.hand[pid].concat(S.pile,[c]);S.pile=[];
+    penkyLog(S,{k:'down',f:pid,c:c,ok:0,n:n});
+  }
+  pFinishTurn(S,pid);
+  return null;
+}
+function penkySkip(S,pid){
+  if(S.status!=='play'||pid!==S.hostPid||S.turn===pid)return 'Пропустити можна лише хід іншого гравця.';
+  penkyLog(S,{k:'skip',f:S.turn});
+  S.turn=pNextActive(S,S.turn);
+  return null;
+}
+function penkyChat(S,pid,text){
+  const t=String(text||'').trim().slice(0,200);
+  if(!t||!S.players[pid])return;
+  S.chat.push({u:pid,t:t,ts:Date.now()});
+  if(S.chat.length>120)S.chat.splice(0,S.chat.length-120);
+}
+function penkyBack(S){
+  Object.assign(S,{status:'lobby',order:[],hand:{},down:{},deck:[],pile:[],burned:0,turn:null,out:[],loser:null,log:[],chat:[]});
+}
+function penkyView(S,pid){
+  const counts={},downN={},players={};
+  (S.order||[]).forEach(u=>{counts[u]=(S.hand[u]||[]).length;downN[u]=(S.down[u]||[]).length});
+  Object.keys(S.players).forEach(u=>{players[u]={name:S.players[u].name,at:S.players[u].at}});
+  return {game:'penky',code:S.code,status:S.status,host:S.hostPid,order:S.order,players:players,counts:counts,downN:downN,
+    deckN:S.deck.length,pile:S.pile.slice(),burned:S.burned,turn:S.turn,out:S.out.slice(),loser:S.loser,log:S.log,chat:S.chat,hand:(S.hand[pid]||[]).slice()};
+}
+function viewAny(S,pid){return S.game==='penky'?penkyView(S,pid):viewFor(S,pid)}
 // ==LOGIC-END==
 
 const RANKS=['Т','2','3','4','5','6','7','8','9','10','В','Д','К','★'];
 const RANK_NAMES=['Туз','Двійка','Трійка','Четвірка',"П'ятірка",'Шістка','Сімка','Вісімка',"Дев'ятка",'Десятка','Валет','Дама','Король','Джокер'];
 const SUITS=['♠','♥','♦','♣'];
 const CODE_CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-const PEER_PREFIX='skrynky-';
+const PREFIXES={skrynky:'skrynky-',penky:'penky-'};
+const GAME_NAMES={skrynky:'Скриньки',penky:'Пеньки'};
 const CHEST='<svg viewBox="0 0 22 18" width="22" height="18" aria-hidden="true"><path d="M2 7a5 5 0 0 1 5-5h8a5 5 0 0 1 5 5v1H2z" fill="currentColor" opacity=".55"/><rect x="2" y="8" width="18" height="8" rx="1.5" fill="currentColor"/><rect x="9" y="6.5" width="4" height="4" rx="1" style="fill:var(--turn)"/></svg>';
 
 const $=id=>document.getElementById(id);
@@ -561,6 +746,7 @@ let peer=null,conns={},hostConn=null;
 let busy=false,busyTimer=null,selT=null,selR=null,prevTurn=null,prevAsks=-1;
 let loadTimer=null,reconnTimer=null,retryTimer=null,hbTimer=null,lastSeen=0,netDown=false,creating=false,attempts=0;
 let gN=null,gRed=null,gSuits=[],prevPend='',lastPrivTs=null;
+let game='skrynky';     // the tab chosen on the entry screen; decides the peer-id prefix and the rules
 
 const nm=u=>(G&&G.players&&G.players[u]&&G.players[u].name)||'Гравець';
 const ci=u=>{const o=(G&&G.order)||[];const i=o.indexOf(u);return i<0?0:i};
@@ -576,7 +762,7 @@ const cardText=c=>c>=52?(c===52?'червоний джокер':'чорний д
 const miniHTML=c=>'<span class="mini'+(isRed(c)?' red':'')+'">'+(c>=52?'★':RANKS[rankOf(c)]+SUITS[suitOf(c)])+'</span>';
 const isHost=()=>role==='host';
 
-function show(name){['entry','loading','lobby','game'].forEach(n=>{$('screen-'+n).hidden=n!==name})}
+function show(name){['entry','loading','lobby','game','penky'].forEach(n=>{$('screen-'+n).hidden=n!==name})}
 function entryErr(t){const e=$('entry-err');e.textContent=t||'';e.hidden=!t}
 function toast(t){
   const el=$('toast');el.textContent=t;el.hidden=false;
@@ -585,7 +771,7 @@ function toast(t){
 function cleanName(s){return String(s||'').replace(/\s+/g,' ').trim().slice(0,16)}
 function genCode(){let s='';for(let i=0;i<5;i++)s+=CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)];return s}
 function setNet(msg){
-  ['net-lobby','net-game'].forEach(id=>{const el=$(id);el.textContent=msg||'';el.hidden=!msg});
+  ['net-lobby','net-game','net-penky'].forEach(id=>{const el=$(id);el.textContent=msg||'';el.hidden=!msg});
 }
 function clone(o){return JSON.parse(JSON.stringify(o))}
 
@@ -593,9 +779,9 @@ function clone(o){return JSON.parse(JSON.stringify(o))}
 function readSaved(){
   try{
     const h=JSON.parse(store.get('skrynky:host')||'null');
-    if(h&&h.S&&h.S.ver===2&&h.S.hostPid===me&&Date.now()-h.ts<SAVE_TTL)return {role:'host',code:h.code,S:h.S};
+    if(h&&h.S&&h.S.ver===2&&h.S.hostPid===me&&Date.now()-h.ts<SAVE_TTL)return {role:'host',code:h.code,S:h.S,game:h.S.game||'skrynky'};
     const g=JSON.parse(store.get('skrynky:guest')||'null');
-    if(g&&g.code&&Date.now()-g.ts<SAVE_TTL)return {role:'guest',code:g.code};
+    if(g&&g.code&&Date.now()-g.ts<SAVE_TTL)return {role:'guest',code:g.code,game:g.game||'skrynky'};
   }catch(e){}
   return null;
 }
@@ -606,8 +792,8 @@ function showSaved(){
   const sv=readSaved(),box=$('saved');
   if(!sv){box.hidden=true;return}
   $('saved-text').innerHTML=sv.role==='host'
-    ?'У вас є незавершена гра <b>'+esc(sv.code)+'</b>, де ви ведучий.'
-    :'Ви грали в кімнаті <b>'+esc(sv.code)+'</b>. Повернутися?';
+    ?'У вас є незавершена гра «'+GAME_NAMES[sv.game]+'» <b>'+esc(sv.code)+'</b>, де ви ведучий.'
+    :'Ви грали в «'+GAME_NAMES[sv.game]+'», кімната <b>'+esc(sv.code)+'</b>. Повернутися?';
   box.hidden=false;
 }
 
@@ -651,16 +837,39 @@ function withOnline(v){
 function broadcast(){
   Object.keys(conns).forEach(pid=>{
     const c=conns[pid];
-    if(c&&c.open){try{c.send({t:'state',view:withOnline(viewFor(S,pid))})}catch(e){}}
+    if(c&&c.open){try{c.send({t:'state',view:withOnline(viewAny(S,pid))})}catch(e){}}
   });
 }
 function hostChanged(){
   persist();broadcast();
-  G=materialize(withOnline(viewFor(S,me)));
+  G=materialize(withOnline(viewAny(S,me)));
   busy=false;clearTimeout(busyTimer);
   onGame();
 }
+function penkyHandle(pid,m){
+  let err=null;
+  switch(m&&m.t){
+    case 'play':err=penkyPlay(S,pid,m.c);break;
+    case 'take':err=penkyTake(S,pid);break;
+    case 'down':err=penkyDown(S,pid,m.i);break;
+    case 'chat':penkyChat(S,pid,m.text);break;
+    case 'skip':err=penkySkip(S,pid);break;
+    case 'start':err=pid===S.hostPid?penkyStart(S):'Почати гру може лише ведучий.';break;
+    case 'again':
+      if(pid!==S.hostPid||S.status!=='done')err='Нову партію може почати лише ведучий після завершення гри.';
+      else penkyBack(S);
+      break;
+    default:err='Невідома дія.';
+  }
+  if(err){
+    if(pid===me){toast(err);busy=false;clearTimeout(busyTimer);if(G)onGame()}
+    else if(conns[pid]&&conns[pid].open){try{conns[pid].send({t:'err',msg:err})}catch(e){}}
+    return;
+  }
+  hostChanged();
+}
 function hostHandle(pid,m){
+  if(S.game==='penky')return penkyHandle(pid,m);
   let err=null;
   switch(m&&m.t){
     case 'ask':err=handleAsk(S,pid,m.to,m.rank);break;
@@ -702,18 +911,18 @@ function onGuestMsg(conn,m){
     if(S.status==='lobby'&&pid!==S.hostPid){delete S.players[pid];delete conns[pid];try{conn.close()}catch(e){}hostChanged()}
     return;
   }
-  if(m.t==='ask'||m.t==='chat'||m.t==='confirm'||m.t==='guess')hostHandle(pid,m);
+  if(m.t==='ask'||m.t==='chat'||m.t==='confirm'||m.t==='guess'||m.t==='play'||m.t==='take'||m.t==='down')hostHandle(pid,m);
 }
 function onGuestClose(conn){
   if(conn.pid&&conns[conn.pid]===conn){delete conns[conn.pid];if(S)hostChanged()}
 }
 function openHostPeer(code){
-  const p=new Peer(PEER_PREFIX+code);
+  const p=new Peer(PREFIXES[game]+code);
   peer=p;
   p.on('open',()=>{
     if(peer!==p)return;
     roomCode=code;creating=false;
-    if(!S)S=newLobby(code,me,myName);
+    if(!S)S=game==='penky'?penkyLobby(code,me,myName):newLobby(code,me,myName);
     S.code=code;
     persist();
     hostChanged();
@@ -761,7 +970,11 @@ function startHost(code,resumeS){
 }
 
 /* ---------- guest: only ever sees its own hand ---------- */
+function materializeP(v){
+  return {game:'penky',code:v.code,status:v.status,host:v.host,order:v.order||[],players:v.players||{},counts:v.counts||{},downN:v.downN||{},deckN:v.deckN||0,pile:v.pile||[],burned:v.burned||0,turn:v.turn,out:v.out||[],loser:v.loser||null,log:v.log||[],chat:v.chat||[],hand:v.hand||[]};
+}
 function materialize(v){
+  if(v.game==='penky')return materializeP(v);
   const g={code:v.code,status:v.status,host:v.host,order:v.order||[],players:v.players||{},books:v.books||{},turn:v.turn,round:v.round||0,asks:v.asks||[],chat:v.chat||[],pend:v.pend||null,priv:v.priv||[]};
   g.hands={};
   g.order.forEach(u=>{g.hands[u]=u===me?(v.hand||[]):new Array((v.counts&&v.counts[u])||0).fill(0)});
@@ -776,7 +989,7 @@ function onHostMsg(m){
     clearTimeout(loadTimer);
     G=materialize(m.view);
     busy=false;clearTimeout(busyTimer);
-    store.set('skrynky:guest',JSON.stringify({code:roomCode,ts:Date.now()}));
+    store.set('skrynky:guest',JSON.stringify({code:roomCode,game:game,ts:Date.now()}));
     onGame();
   }else if(m.t==='err'){
     if(m.fatal){fail(m.msg);return}
@@ -820,7 +1033,7 @@ function scheduleReconnect(){
 }
 function connectToHost(){
   if(role!=='guest'||!peer||peer.destroyed)return;
-  const c=peer.connect(PEER_PREFIX+roomCode,{reliable:true,serialization:'json'});
+  const c=peer.connect(PREFIXES[game]+roomCode,{reliable:true,serialization:'json'});
   hostConn=c;
   setTimeout(()=>{if(hostConn===c&&!c.open&&role==='guest')dropHost('Не вдається з’єднатися з ведучим. Повторюємо спроби…')},10000);
   c.on('open',()=>{
@@ -845,7 +1058,7 @@ function openGuestPeer(){
   p.on('error',err=>{
     if(peer!==p)return;
     if(err.type==='peer-unavailable'){
-      if(!G){fail('Гри з таким кодом немає, або ведучий уже закрив вкладку. Перевірте код.');return}
+      if(!G){fail('Гри «'+GAME_NAMES[game]+'» з таким кодом немає, або ведучий уже закрив вкладку. Перевірте код і те, що вибрано вкладку тієї самої гри.');return}
       netDown=true;setNet('Ведучого зараз немає в мережі. Чекаємо, поки він повернеться…');
       scheduleReconnect();
     }else if(err.type==='network'||err.type==='server-error'||err.type==='socket-error'||err.type==='socket-closed'){
@@ -875,11 +1088,12 @@ function doAsk(){
   if(!canAsk(G,me,selT,selR))return;
   sendBusy({t:'ask',to:selT,rank:selR});
 }
-function skipTurn(){if(isHost()&&G&&G.status==='play'&&mustAct(G)!==me)act({t:'skip'})}
+function skipTurn(){if(G&&G.game==='penky'){if(isHost()&&G.status==='play'&&G.turn!==me)act({t:'skip'});return}if(isHost()&&G&&G.status==='play'&&mustAct(G)!==me)act({t:'skip'})}
+function rerender(){if(G)(G.game==='penky'?renderPenky():renderGame())}
 function sendBusy(m){
-  busy=true;renderGame();
+  busy=true;rerender();
   clearTimeout(busyTimer);
-  busyTimer=setTimeout(()=>{busy=false;if(G)renderGame()},5000);
+  busyTimer=setTimeout(()=>{busy=false;rerender()},5000);
   act(m);
 }
 function answerConfirm(said){
@@ -914,6 +1128,20 @@ function pickRank(r){
 }
 
 /* ---------- entering ---------- */
+const HERO={
+  skrynky:['Скриньки','Карткова гра на 54 карти для 2–6 гравців. Питайте карти один в одного й збирайте скриньки: чотири однакові карти або двоє джокерів.'],
+  penky:['Пеньки','Карткова гра на 52 карти для 2–6 гравців. Скидайте карти на спільну стопку: двійка її обнуляє, десятка спалює. Хто лишиться з картами останнім, програє.']
+};
+function setTab(g){
+  if(!PREFIXES[g])g='skrynky';
+  game=g;store.set('skrynky:tab',g);
+  Object.keys(PREFIXES).forEach(k=>{
+    const t=$('tab-'+k);t.classList.toggle('on',k===g);t.setAttribute('aria-selected',k===g);
+    $('rules-'+k).hidden=k!==g;
+  });
+  $('hero-title').textContent=HERO[g][0];$('hero-lead').textContent=HERO[g][1];
+  entryErr('');
+}
 function createGame(){
   const name=cleanName($('nick').value);
   if(!name){entryErr('Введіть ім’я, щоб інші гравці бачили, хто ви.');return}
@@ -936,6 +1164,7 @@ function resumeSaved(){
   const sv=readSaved();
   if(!sv)return;
   if(typeof Peer==='undefined'){entryErr('Не вдалося завантажити бібліотеку зв’язку. Оновіть сторінку.');return}
+  setTab(sv.game);
   myName=cleanName($('nick').value)||store.get('skrynky:nick')||'Гравець';
   entryErr('');
   if(sv.role==='host'){
@@ -947,6 +1176,10 @@ function resumeSaved(){
 /* ---------- rendering ---------- */
 function onGame(){
   if(!G)return;
+  if(G.game==='penky'){
+    if(G.status==='lobby'){show('lobby');renderLobby();return}
+    show('penky');renderPenky();return;
+  }
   if(G.status==='lobby'){show('lobby');renderLobby();return}
   show('game');
   if(G.turn!==prevTurn){prevTurn=G.turn;selT=null;selR=null}
@@ -964,6 +1197,8 @@ function onGame(){
 }
 function renderLobby(){
   $('lobby-code').textContent=roomCode;
+  const pk=G.game==='penky';
+  $('lobby-eyebrow').textContent='Код гри · '+GAME_NAMES[pk?'penky':'skrynky'];
   const ids=Object.keys(G.players).sort((a,b)=>G.players[a].at-G.players[b].at);
   $('lobby-count').textContent='Гравці: '+ids.length+' з 6';
   $('lobby-players').innerHTML=ids.map((u,i)=>
@@ -974,7 +1209,7 @@ function renderLobby(){
   $('lobby-actions').innerHTML=
     (host
       ?'<button class="btn" type="button" data-act="start"'+(ids.length<2?' disabled':'')+'>Почати гру</button>'+
-        '<p class="muted">'+(ids.length<2?'Потрібно щонайменше двоє гравців.':'Кожен отримає по 4 карти.')+'</p>'
+        '<p class="muted">'+(ids.length<2?'Потрібно щонайменше двоє гравців.':(pk?'Кожен отримає 3 карти в руку й 2 закриті.':'Кожен отримає по 4 карти.'))+'</p>'
       :'<p class="muted">Чекаємо, поки ведучий почне гру.</p>')+
     '<button class="btn ghost" type="button" data-act="leave">'+(host?'Закрити гру':'Вийти')+'</button>';
 }
@@ -1123,6 +1358,110 @@ function renderGame(){
   $('action').innerHTML=actionHTML(myTurn,isPlayer);
   renderFeed();
 }
+
+/* ---------- «Пеньки»: rendering and actions ---------- */
+const pTop=()=>G.pile.length?G.pile[G.pile.length-1]:null;
+function pMyTurn(){return !!G&&G.game==='penky'&&G.status==='play'&&G.turn===me&&G.order.indexOf(me)>=0}
+function pPlay(c){if(busy||!pMyTurn()||G.hand.indexOf(c)<0||!pLegal(G.pile,c))return;sendBusy({t:'play',c:c})}
+function pTake(){if(busy||!pMyTurn()||!G.pile.length)return;sendBusy({t:'take'})}
+function pDown(i){if(busy||!pMyTurn()||G.hand.length||G.deckN)return;sendBusy({t:'down',i:i})}
+function pNeed(){
+  const t=pTop();
+  if(t===null)return 'Стопка порожня: кладіть будь-яку карту.';
+  if(t%13===1)return 'Зверху двійка: кладіть будь-яку карту.';
+  return 'Кладіть '+RANK_NAMES[t%13].toLowerCase()+' або вищу. Двійку й десятку можна класти завжди.';
+}
+function pPlayerHTML(u){
+  const n=G.counts[u]||0,d=G.downN[u]||0,oi=G.out.indexOf(u);
+  const turn=G.status==='play'&&G.turn===u;
+  const fan=n?'<span class="fan" aria-hidden="true">'+'<i></i>'.repeat(Math.min(n,8))+'</span>':'<span class="fan empty" aria-hidden="true"></span>';
+  const slots='<span class="dslot"></span>'.repeat(d);
+  return '<div class="pl'+(turn?' turn':'')+(oi>=0?' out':'')+'" style="--pc:'+pcv(u)+'">'+
+    '<span class="plh"><span class="av">'+esc(initial(nm(u)))+'</span><span class="nm">'+esc(nm(u))+'</span>'+
+      (u===me?'<span class="tag">ви</span>':'')+(G.players[u]&&G.players[u].online===false?'<span class="tag off">поза мережею</span>':'')+
+      (turn?'<span class="pill-turn">ходить</span>':'')+(oi>=0?'<span class="tag">місце №'+(oi+1)+'</span>':'')+(G.status==='done'&&G.loser===u?'<span class="tag off">програш</span>':'')+'</span>'+
+    '<span class="plc">'+fan+'<span class="cnt"><b>'+n+'</b>'+plural(n,['карта','карти','карт'])+'</span></span>'+
+    '<span class="dnrow">'+(d?slots+'<span>закриті: '+d+'</span>':'<span>закритих нема</span>')+'</span></div>';
+}
+function pResultsHTML(){
+  const rows=G.out.map((u,i)=>[u,'місце №'+(i+1)]);
+  if(G.loser)rows.push([G.loser,'програш']);
+  return '<div class="results"><p class="eyebrow">Гру завершено</p><h2>'+(G.loser?'Програє '+esc(nm(G.loser)):'Гру завершено')+'</h2>'+
+    rows.map(r=>'<div class="res-row"><span class="av" style="--pc:'+pcv(r[0])+'">'+esc(initial(nm(r[0])))+'</span><span class="nm">'+esc(nm(r[0]))+'</span><span class="num">'+r[1]+'</span></div>').join('')+'</div>';
+}
+function pCenterHTML(){
+  if(G.status==='done')return pResultsHTML();
+  const top=G.pile.slice(-5);
+  const pile=top.length?'<div class="pile">'+top.map(cardHTML).join('')+'</div>':'<div class="pile empty">Стопка порожня</div>';
+  return '<div class="hand-head"><span class="eyebrow">Центральна стопка</span><span class="muted">'+G.pile.length+' '+plural(G.pile.length,['карта','карти','карт'])+'</span></div>'+pile+'<p class="need">'+pNeed()+'</p>';
+}
+function pActionHTML(isPlayer){
+  const leaveBtn='<button class="btn ghost sm" type="button" data-act="leave">'+(isHost()?'Закрити гру':'Вийти з гри')+'</button>';
+  if(G.status==='done'){
+    return isHost()
+      ?'<button class="btn" type="button" data-act="again">Нова партія</button>'+leaveBtn
+      :'<p class="muted">Чекаємо, поки ведучий почне нову партію.</p>'+leaveBtn;
+  }
+  if(!isPlayer)return '<p class="muted">Ви спостерігаєте за грою.</p>'+leaveBtn;
+  if(!pMyTurn()){
+    const skip=(isHost()&&G.turn!==me)?'<button class="btn ghost sm" type="button" data-act="skip">Пропустити хід гравця</button>':'';
+    return '<div class="wait"><span class="dot" aria-hidden="true"></span><span>Ходить <b>'+esc(nm(G.turn))+'</b></span></div>'+skip;
+  }
+  const hasLegal=G.hand.some(c=>pLegal(G.pile,c));
+  if(G.hand.length&&hasLegal)return '<p><b>Ваш хід.</b> Торкніться карти, яку кладете.</p>';
+  if(G.hand.length)return '<p><b>Жодна карта не підходить.</b></p><button class="btn" type="button" data-act="take"'+(busy?' disabled':'')+'>Забрати стопку ('+G.pile.length+')</button>';
+  if(!G.deckN)return '<p><b>Ваш хід.</b> Карт у руці нема: відкрийте одну із закритих карт наосліп.</p>';
+  return '<div class="wait"><span class="dot" aria-hidden="true"></span><span>Оновлюємо стан…</span></div>';
+}
+function pLogHTML(e){
+  const who=u=>'<span class="who" style="--pc:'+pcv(u)+'">'+esc(nm(u))+'</span>';
+  const fx={burn10:'десятка спалює стопку',four:'чотири однакові спалюють стопку',reset:'двійка обнуляє стопку'};
+  if(e.k==='play')return who(e.f)+'<span class="arr">→</span>'+miniHTML(e.c)+(e.fx?'<span class="luck">· '+fx[e.fx]+'</span>':'');
+  if(e.k==='take')return who(e.f)+' <span class="no">забирає стопку ('+e.n+' '+plural(e.n,['карта','карти','карт'])+')</span>';
+  if(e.k==='down'){
+    return who(e.f)+'<span class="no">відкриває закриту:</span>'+miniHTML(e.c)+
+      (e.ok?(e.fx?'<span class="luck">· '+fx[e.fx]+'</span>':'<span class="ok">підходить</span>'):'<span class="no">· не підходить, забирає стопку ('+(e.n+1)+')</span>');
+  }
+  if(e.k==='out')return who(e.f)+' <span class="ok">позбувся карт · місце №'+e.p+'</span>';
+  if(e.k==='skip')return who(e.f)+' <span class="no">· хід пропущено ведучим</span>';
+  return '';
+}
+function renderPFeed(){
+  const box=$('pfeed');
+  if(!box||!G||G.status==='lobby')return;
+  const items=[];
+  (G.log||[]).forEach(e=>{const h=pLogHTML(e);if(h)items.push({ts:e.ts,h:'<div class="ev'+(e.fx?' chestev':'')+'">'+h+'</div>'})});
+  (G.chat||[]).forEach(m=>items.push({ts:m.ts,h:msgHTML(m)}));
+  items.sort((a,b)=>a.ts-b.ts);
+  const near=box.scrollHeight-box.scrollTop-box.clientHeight<60;
+  box.innerHTML=items.length?items.slice(-60).map(i=>i.h).join(''):'<p class="muted empty-feed">Тут з’являтимуться ходи гри й повідомлення гравців.</p>';
+  if(near)box.scrollTop=box.scrollHeight;
+}
+function renderPenky(){
+  const order=G.order||[],isPlayer=order.indexOf(me)>=0,myTurn=pMyTurn();
+  $('p-code').textContent=roomCode;
+  $('p-deck').textContent=G.deckN;
+  $('p-burn').textContent=G.burned;
+  $('btn-leave-penky').textContent=isHost()?'Закрити гру':'Вийти';
+  $('p-players').innerHTML=order.map(pPlayerHTML).join('');
+  $('p-center').innerHTML=pCenterHTML();
+  $('p-mine').hidden=!isPlayer||G.status==='done'&&!G.hand.length&&!G.downN[me];
+  const hand=G.hand.slice().sort((a,b)=>pVal(a)-pVal(b)||a-b);
+  $('p-hand-count').textContent=hand.length+' '+plural(hand.length,['карта','карти','карт']);
+  const canBlind=myTurn&&!hand.length&&!G.deckN&&!busy,dn=G.downN[me]||0;
+  let d='';
+  for(let i=0;i<dn;i++)d+=canBlind?'<button type="button" class="dback act" data-down="'+i+'" aria-label="Закрита карта '+(i+1)+'"></button>':'<span class="dback" aria-hidden="true"></span>';
+  $('p-down').innerHTML=dn?d+'<span class="dlabel">закриті карти'+(canBlind?': відкрийте будь-яку':'')+'</span>':'<span class="dlabel">Закритих карт не лишилось.</span>';
+  $('p-hand').innerHTML=hand.length?hand.map(c=>{
+    const ok=pLegal(G.pile,c);
+    return myTurn&&!busy&&ok
+      ?'<button type="button" class="pcard ok" data-card="'+c+'" aria-label="'+cardText(c)+'">'+cardHTML(c)+'</button>'
+      :'<span class="pcard'+(myTurn&&!ok?' dim':'')+'">'+cardHTML(c)+'</span>';
+  }).join(''):'<p class="muted">У руці карт нема.</p>';
+  $('p-action').innerHTML=pActionHTML(isPlayer);
+  renderPFeed();
+}
+
 function msgHTML(m){
   const mine=m.u===me;
   return '<div class="msg'+(mine?' mine':'')+'" style="--pc:'+pcv(m.u)+'"><b>'+esc(nm(m.u))+'</b>'+esc(m.t)+'</div>';
@@ -1158,7 +1497,7 @@ function bind(){
   $('code').addEventListener('keydown',e=>{if(e.key==='Enter')joinGame()});
   $('nick').addEventListener('keydown',e=>{if(e.key==='Enter')($('code').value?joinGame():createGame())});
   document.addEventListener('click',e=>{
-    const el=e.target.closest('[data-act],[data-pick],[data-rank],[data-gn],[data-gred],[data-gsuit]');
+    const el=e.target.closest('[data-act],[data-pick],[data-rank],[data-gn],[data-gred],[data-gsuit],[data-card],[data-down],[data-tab]');
     if(!el)return;
     if(el.dataset.gn!==undefined||el.dataset.gred!==undefined||el.dataset.gsuit!==undefined){
       if(busy||!G||!G.pend||G.pend.stage!=='guess'||G.pend.f!==me)return;
@@ -1168,6 +1507,9 @@ function bind(){
       else{const x=+el.dataset.gsuit,i=gSuits.indexOf(x);if(i<0)gSuits.push(x);else gSuits.splice(i,1)}
       renderGame();return;
     }
+    if(el.dataset.tab){setTab(el.dataset.tab);return}
+    if(el.dataset.card!==undefined){pPlay(+el.dataset.card);return}
+    if(el.dataset.down!==undefined){pDown(+el.dataset.down);return}
     if(el.dataset.pick){pickTarget(el.dataset.pick);return}
     if(el.dataset.rank!==undefined){pickRank(+el.dataset.rank);return}
     const a=el.dataset.act;
@@ -1180,6 +1522,14 @@ function bind(){
     else if(a==='no')answerConfirm(false);
     else if(a==='guess')submitGuess();
     else if(a==='again')againAct();
+    else if(a==='take')pTake();
+  });
+  $('pchat-form').addEventListener('submit',e=>{
+    e.preventDefault();
+    const input=$('pchat-input'),t=input.value.trim().slice(0,200);
+    if(!t||!G||G.status==='lobby')return;
+    input.value='';
+    act({t:'chat',text:t});
   });
   $('chat-form').addEventListener('submit',e=>{
     e.preventDefault();
@@ -1192,6 +1542,7 @@ function bind(){
 
 $('nick').value=store.get('skrynky:nick')||'';
 bind();
+setTab(store.get('skrynky:tab')||'skrynky');
 showSaved();
 if(typeof Peer==='undefined'){
   entryErr('Не вдалося завантажити бібліотеку зв’язку (PeerJS). Перевірте інтернет чи блокувальник реклами й оновіть сторінку.');
