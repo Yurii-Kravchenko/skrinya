@@ -228,7 +228,7 @@ button.grp:hover{transform:translateY(-4px)}
 
 /* tabs and the second game */
 .tabs{display:flex;gap:6px;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
-.tab{flex:1;padding:10px 12px;border:0;border-radius:9px;background:transparent;font-weight:800;cursor:pointer;color:var(--muted)}
+.tab{flex:1;padding:10px 4px;font-size:14px;border:0;border-radius:9px;background:transparent;font-weight:800;cursor:pointer;color:var(--muted)}
 .tab.on{background:var(--accent);color:var(--on-accent)}
 .dnrow{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--table-muted);min-height:34px}
 .dslot{display:block;width:22px;height:32px;border-radius:4px;border:2px solid var(--card);background:repeating-linear-gradient(45deg,var(--back-1) 0 4px,var(--back-2) 4px 8px)}
@@ -268,6 +268,16 @@ button.dback:hover{transform:translateY(-5px)}
 .pcard.tr .card{box-shadow:0 0 0 2px color-mix(in srgb,var(--turn) 60%,transparent),0 1px 2px rgba(0,0,0,.2)}
 .pcard.sel{transform:translateY(-10px);border-color:var(--turn);background:color-mix(in srgb,var(--turn) 18%,transparent)}
 
+/* 21 */
+.table .no{color:var(--table-fg);opacity:.85}
+.table .ok{color:#8be0ae}
+.card.back{background:repeating-linear-gradient(45deg,var(--back-1) 0 5px,var(--back-2) 5px 10px);border:2px solid var(--card)}
+.bjrow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:6px 0}
+.bjrow .nm{font-weight:800;min-width:70px}
+.bjsum{font-family:var(--font-display);font-size:15px}
+.score{font-size:12px;color:var(--table-muted)}
+.score b{color:var(--table-fg);font-size:15px}
+.mini.back{background:repeating-linear-gradient(45deg,var(--back-1) 0 4px,var(--back-2) 4px 8px);border-color:var(--card);width:22px;min-width:22px;padding:0}
 .toast{
   position:fixed;left:50%;transform:translateX(-50%);bottom:calc(88px + env(safe-area-inset-bottom,0px));
   max-width:min(92vw,420px);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;z-index:20;text-align:center;
@@ -286,6 +296,7 @@ button.dback:hover{transform:translateY(-5px)}
       <button id="tab-skrynky" class="tab on" type="button" role="tab" data-tab="skrynky">Скриньки</button>
       <button id="tab-penky" class="tab" type="button" role="tab" data-tab="penky">Пеньки</button>
       <button id="tab-durak" class="tab" type="button" role="tab" data-tab="durak">Дурак</button>
+      <button id="tab-bj" class="tab" type="button" role="tab" data-tab="bj">Очко</button>
     </div>
     <div class="hero">
       <div class="deco" aria-hidden="true">
@@ -357,6 +368,20 @@ button.dback:hover{transform:translateY(-5px)}
         <li>Коли всі відбито й ніхто більше не докидає, натисніть «Бито»: карти йдуть у відбій. Потім усі добирають до 6, спершу атакувальник, захисник останнім.</li>
         <li>Програє («дурак») той, хто лишився з картами останнім. Якщо останні гравці позбулися карт одночасно, це нічия.</li>
         <li>Ведучий може пропустити гравця, який завис.</li>
+      </ul>
+    </details>
+    <details id="rules-bj" class="rules" hidden>
+      <summary>Правила</summary>
+      <ul>
+        <li>Ви граєте не один проти одного, а проти банку (його веде гра). Мета: набрати більше очок, ніж банк, але не більше 21.</li>
+        <li>Два режими, їх обирає ведучий у лобі. «Очко»: 36 карт, шістка–десятка за номіналом, валет 2, дама 3, король 4, туз 11. «Блекджек»: 52 карти, фігури по 10, туз 11 або 1.</li>
+        <li>У «Очку» два тузи (22) — «золоте очко», найсильніша рука. Двокартковий 21 (туз + десятка) теж «очко» і б’є звичайний 21 з трьох і більше карт.</li>
+        <li>Усім і банку роздають по 2 карти. Свої карти бачите лише ви, у банка видно одну.</li>
+        <li>На своєму ході беріть «Ще карту» або кажіть «Досить». Більше 21 — перебір, раунд програно.</li>
+        <li>Коли всі зіграли, банк відкривається й добирає до 17 і більше. Якщо банк у переборі, виграють усі, хто не перебрав.</li>
+        <li>Нічия при рівних очках. Рахунок: виграш +1, «очко» +2, програш −1. Рахунок зберігається між роздачами.</li>
+        <li>Якщо в банка «очко» одразу після роздачі, раунд закінчується без ходів.</li>
+        <li>Ведучий може пропустити гравця, який завис, і запустити нову роздачу.</li>
       </ul>
     </details>
   </section>
@@ -478,6 +503,37 @@ button.dback:hover{transform:translateY(-5px)}
         <div id="dfeed" class="feed" aria-live="polite"></div>
         <form id="dchat-form" class="chat-form">
           <input id="dchat-input" maxlength="200" autocomplete="off" placeholder="Повідомлення…" aria-label="Повідомлення">
+          <button class="btn sm" type="submit">Надіслати</button>
+        </form>
+      </aside>
+    </div>
+  </section>
+
+  <section id="screen-bj" hidden>
+    <div class="layout">
+      <div class="main">
+        <div id="net-bj" class="net" hidden></div>
+        <div class="table">
+          <div class="stats">
+            <div class="st"><span class="eyebrow">Код</span><b id="b-code"></b></div>
+            <div class="st"><span class="eyebrow">Роздача</span><b id="b-round"></b></div>
+            <div class="st"><span class="eyebrow">Режим</span><b id="b-mode" style="font-size:14px"></b></div>
+            <button class="btn ghost sm" type="button" data-act="leave" id="btn-leave-bj">Вийти</button>
+          </div>
+          <div id="b-players" class="players"></div>
+        </div>
+        <div id="b-center" class="panel pcenter"></div>
+        <div id="b-mine" class="panel">
+          <div class="hand-head"><span class="eyebrow">Ваші карти</span><span id="b-sum" class="muted"></span></div>
+          <div id="b-hand" class="hand"></div>
+        </div>
+        <div id="b-action" class="action"></div>
+      </div>
+      <aside class="panel chat" aria-label="Журнал і чат">
+        <div class="chat-head"><h2>Журнал і чат</h2><span class="mem">ходи гри</span></div>
+        <div id="bfeed" class="feed" aria-live="polite"></div>
+        <form id="bchat-form" class="chat-form">
+          <input id="bchat-input" maxlength="200" autocomplete="off" placeholder="Повідомлення…" aria-label="Повідомлення">
           <button class="btn sm" type="submit">Надіслати</button>
         </form>
       </aside>
@@ -927,15 +983,107 @@ function durakView(S,pid){
     trump:S.trump,trumpCard:S.deck.length?S.deck[0]:null,table:S.table.map(p=>({a:p.a,d:p.d})),att:S.att,def:S.def,taking:S.taking,passed:Object.assign({},S.passed),
     limit:S.limit,discard:S.discard,out:S.out.slice(),loser:S.loser,draw:S.draw,opts:{transfer:!!S.opts.transfer,deck:S.opts.deck},log:S.log,chat:S.chat,hand:(S.hand[pid]||[]).slice()};
 }
-function viewAny(S,pid){return S.game==='penky'?penkyView(S,pid):S.game==='durak'?durakView(S,pid):viewFor(S,pid)}
+/* ---- «Очко» (36 cards: J=2, Q=3, K=4, A=11) and «Блекджек» (52 cards): players against the bank ---- */
+function bjIds(o){const a=[];for(let c=0;c<52;c++){const r=c%13;if(o.deck===52||r===0||r>=5)a.push(c)}return a}
+function bjCardVal(c,deck){const r=c%13;if(r===0)return 11;if(r>=10)return deck===52?10:r-8;return r+1}
+function bjHand(cards,deck){
+  let v=0,aces=0;
+  cards.forEach(c=>{v+=bjCardVal(c,deck);if(c%13===0)aces++});
+  const golden=deck===36&&cards.length===2&&aces===2;          // two aces = 22, the best hand in «Очко»
+  if(deck===52)while(v>21&&aces>0){v-=10;aces--}
+  return {v:v,bust:!golden&&v>21,golden:golden,natural:golden||(cards.length===2&&v===21),soft:deck===52&&aces>0};
+}
+const bjScore=h=>h.golden?100:h.bust?-1:h.v+(h.natural?0.5:0);
+function bjJudge(p,d){                                          // -> {r:'win'|'lose'|'push', d: points}
+  if(p.bust)return {r:'lose',d:-1};
+  if(d.bust)return {r:'win',d:p.natural?2:1};
+  const a=bjScore(p),b=bjScore(d);
+  if(a>b)return {r:'win',d:p.natural?2:1};
+  if(a<b)return {r:'lose',d:-1};
+  return {r:'push',d:0};
+}
+function bjLobby(code,hostPid,name){
+  const p={};p[hostPid]={name:name,at:Date.now()};
+  return {ver:2,game:'bj',code:code,hostPid:hostPid,status:'lobby',created:Date.now(),players:p,opts:{deck:36},
+    order:[],hand:{},deck:[],dealer:[],turn:null,stood:{},scores:{},round:0,results:null,log:[],chat:[]};
+}
+function bjSetOpts(S,pid,o){
+  if(pid!==S.hostPid||S.status!=='lobby')return 'Налаштування змінює лише ведучий, поки гра не почалась.';
+  if(!o||(o.deck!==36&&o.deck!==52))return 'Некоректна колода.';
+  S.opts.deck=o.deck;return null;
+}
+function bjDraw(S){if(!S.deck.length)S.deck=shuffle(bjIds(S.opts));return S.deck.pop()}
+function bjDeal(S){
+  S.deck=shuffle(bjIds(S.opts));S.round++;S.stood={};S.results=null;S.log=[];S.dealer=[];
+  S.order.forEach(u=>{S.hand[u]=[]});
+  for(let i=0;i<2;i++){S.order.forEach(u=>S.hand[u].push(bjDraw(S)));S.dealer.push(bjDraw(S))}
+  S.status='play';
+  penkyLog(S,{k:'round',n:S.round});
+  if(bjHand(S.dealer,S.opts.deck).natural){bjFinish(S);return}
+  S.order.forEach(u=>{if(bjHand(S.hand[u],S.opts.deck).natural)S.stood[u]=true});
+  bjNext(S);
+}
+function bjStart(S){
+  if(S.status!=='lobby')return 'Гра вже йде.';
+  const ids=Object.keys(S.players).sort((a,b)=>S.players[a].at-S.players[b].at).slice(0,6);
+  if(ids.length<2)return 'Потрібно щонайменше двоє гравців.';
+  S.order=ids;S.scores={};ids.forEach(u=>{S.scores[u]=0});S.round=0;S.chat=[];
+  bjDeal(S);return null;
+}
+function bjNext(S){
+  const nx=S.order.find(u=>!S.stood[u]);
+  if(nx){S.turn=nx;return}
+  bjFinish(S);
+}
+function bjFinish(S){
+  const dk=S.opts.deck;
+  const need=S.order.some(u=>{const h=bjHand(S.hand[u],dk);return !h.bust&&!h.natural});
+  const n0=S.dealer.length;
+  if(need&&!bjHand(S.dealer,dk).natural)while(bjHand(S.dealer,dk).v<17&&!bjHand(S.dealer,dk).bust)S.dealer.push(bjDraw(S));
+  const dh=bjHand(S.dealer,dk),res={};
+  S.order.forEach(u=>{const j=bjJudge(bjHand(S.hand[u],dk),dh);res[u]=j;S.scores[u]=(S.scores[u]||0)+j.d});
+  S.results=res;S.turn=null;S.status='done';
+  penkyLog(S,{k:'dealer',n:S.dealer.length-n0});
+}
+function bjHit(S,pid){
+  if(S.status!=='play'||S.turn!==pid)return 'Зараз не ваш хід.';
+  S.hand[pid].push(bjDraw(S));
+  const h=bjHand(S.hand[pid],S.opts.deck);
+  penkyLog(S,{k:'hit',f:pid,n:S.hand[pid].length});
+  if(h.bust||h.v>=21)S.stood[pid]=true;
+  if(S.stood[pid])bjNext(S);
+  return null;
+}
+function bjStand(S,pid){
+  if(S.status!=='play'||S.turn!==pid)return 'Зараз не ваш хід.';
+  S.stood[pid]=true;penkyLog(S,{k:'stand',f:pid});bjNext(S);return null;
+}
+function bjSkip(S,pid){
+  if(S.status!=='play'||pid!==S.hostPid||S.turn===pid)return 'Пропустити можна лише хід іншого гравця.';
+  const u=S.turn;S.stood[u]=true;penkyLog(S,{k:'skip',f:u});bjNext(S);return null;
+}
+function bjAgain(S,pid){
+  if(pid!==S.hostPid||S.status!=='done')return 'Нову роздачу може почати лише ведучий після завершення раунду.';
+  bjDeal(S);return null;
+}
+function bjView(S,pid){
+  const counts={},players={},done=S.status==='done';
+  (S.order||[]).forEach(u=>{counts[u]=(S.hand[u]||[]).length});
+  Object.keys(S.players).forEach(u=>{players[u]={name:S.players[u].name,at:S.players[u].at}});
+  const hands=done?JSON.parse(JSON.stringify(S.hand)):null;
+  return {game:'bj',code:S.code,status:S.status,host:S.hostPid,order:S.order,players:players,counts:counts,
+    dealer:done?S.dealer.slice():S.dealer.slice(0,1),dealerN:S.dealer.length,turn:S.turn,stood:Object.assign({},S.stood),scores:Object.assign({},S.scores),
+    round:S.round,results:S.results,opts:{deck:S.opts.deck},log:S.log,chat:S.chat,hand:(S.hand[pid]||[]).slice(),hands:hands};
+}
+function viewAny(S,pid){return S.game==='penky'?penkyView(S,pid):S.game==='durak'?durakView(S,pid):S.game==='bj'?bjView(S,pid):viewFor(S,pid)}
 // ==LOGIC-END==
 
 const RANKS=['Т','2','3','4','5','6','7','8','9','10','В','Д','К','★'];
 const RANK_NAMES=['Туз','Двійка','Трійка','Четвірка',"П'ятірка",'Шістка','Сімка','Вісімка',"Дев'ятка",'Десятка','Валет','Дама','Король','Джокер'];
 const SUITS=['♠','♥','♦','♣'];
 const CODE_CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-const PREFIXES={skrynky:'skrynky-',penky:'penky-',durak:'durak-'};
-const GAME_NAMES={skrynky:'Скриньки',penky:'Пеньки',durak:'Дурак'};
+const PREFIXES={skrynky:'skrynky-',penky:'penky-',durak:'durak-',bj:'ochko-'};
+const GAME_NAMES={skrynky:'Скриньки',penky:'Пеньки',durak:'Дурак',bj:'Очко (21)'};
 const CHEST='<svg viewBox="0 0 22 18" width="22" height="18" aria-hidden="true"><path d="M2 7a5 5 0 0 1 5-5h8a5 5 0 0 1 5 5v1H2z" fill="currentColor" opacity=".55"/><rect x="2" y="8" width="18" height="8" rx="1.5" fill="currentColor"/><rect x="9" y="6.5" width="4" height="4" rx="1" style="fill:var(--turn)"/></svg>';
 
 const $=id=>document.getElementById(id);
@@ -985,7 +1133,7 @@ const cardText=c=>c>=52?(c===52?'червоний джокер':'чорний д
 const miniHTML=c=>'<span class="mini'+(isRed(c)?' red':'')+'">'+(c>=52?'★':RANKS[rankOf(c)]+SUITS[suitOf(c)])+'</span>';
 const isHost=()=>role==='host';
 
-function show(name){['entry','loading','lobby','game','penky','durak'].forEach(n=>{$('screen-'+n).hidden=n!==name})}
+function show(name){['entry','loading','lobby','game','penky','durak','bj'].forEach(n=>{$('screen-'+n).hidden=n!==name})}
 function entryErr(t){const e=$('entry-err');e.textContent=t||'';e.hidden=!t}
 function toast(t){
   const el=$('toast');el.textContent=t;el.hidden=false;
@@ -994,7 +1142,7 @@ function toast(t){
 function cleanName(s){return String(s||'').replace(/\s+/g,' ').trim().slice(0,16)}
 function genCode(){let s='';for(let i=0;i<5;i++)s+=CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)];return s}
 function setNet(msg){
-  ['net-lobby','net-game','net-penky','net-durak'].forEach(id=>{const el=$(id);el.textContent=msg||'';el.hidden=!msg});
+  ['net-lobby','net-game','net-penky','net-durak','net-bj'].forEach(id=>{const el=$(id);el.textContent=msg||'';el.hidden=!msg});
 }
 function clone(o){return JSON.parse(JSON.stringify(o))}
 
@@ -1069,6 +1217,25 @@ function hostChanged(){
   busy=false;clearTimeout(busyTimer);
   onGame();
 }
+function bjHandle(pid,m){
+  let err=null;
+  switch(m&&m.t){
+    case 'hit':err=bjHit(S,pid);break;
+    case 'stand':err=bjStand(S,pid);break;
+    case 'chat':penkyChat(S,pid,m.text);break;
+    case 'skip':err=bjSkip(S,pid);break;
+    case 'opts':err=bjSetOpts(S,pid,m.o);break;
+    case 'start':err=pid===S.hostPid?bjStart(S):'Почати гру може лише ведучий.';break;
+    case 'again':err=bjAgain(S,pid);break;
+    default:err='Невідома дія.';
+  }
+  if(err){
+    if(pid===me){toast(err);busy=false;clearTimeout(busyTimer);if(G)onGame()}
+    else if(conns[pid]&&conns[pid].open){try{conns[pid].send({t:'err',msg:err})}catch(e){}}
+    return;
+  }
+  hostChanged();
+}
 function durakHandle(pid,m){
   let err=null;
   switch(m&&m.t){
@@ -1119,6 +1286,7 @@ function penkyHandle(pid,m){
 function hostHandle(pid,m){
   if(S.game==='penky')return penkyHandle(pid,m);
   if(S.game==='durak')return durakHandle(pid,m);
+  if(S.game==='bj')return bjHandle(pid,m);
   let err=null;
   switch(m&&m.t){
     case 'ask':err=handleAsk(S,pid,m.to,m.rank);break;
@@ -1160,7 +1328,7 @@ function onGuestMsg(conn,m){
     if(S.status==='lobby'&&pid!==S.hostPid){delete S.players[pid];delete conns[pid];try{conn.close()}catch(e){}hostChanged()}
     return;
   }
-  if(m.t==='ask'||m.t==='chat'||m.t==='confirm'||m.t==='guess'||m.t==='play'||m.t==='take'||m.t==='down'||m.t==='att'||m.t==='def'||m.t==='tr'||m.t==='pass')hostHandle(pid,m);
+  if(m.t==='ask'||m.t==='chat'||m.t==='confirm'||m.t==='guess'||m.t==='play'||m.t==='take'||m.t==='down'||m.t==='att'||m.t==='def'||m.t==='tr'||m.t==='pass'||m.t==='hit'||m.t==='stand')hostHandle(pid,m);
 }
 function onGuestClose(conn){
   if(conn.pid&&conns[conn.pid]===conn){delete conns[conn.pid];if(S)hostChanged()}
@@ -1171,7 +1339,7 @@ function openHostPeer(code){
   p.on('open',()=>{
     if(peer!==p)return;
     roomCode=code;creating=false;
-    if(!S)S=game==='penky'?penkyLobby(code,me,myName):game==='durak'?durakLobby(code,me,myName):newLobby(code,me,myName);
+    if(!S)S=game==='penky'?penkyLobby(code,me,myName):game==='durak'?durakLobby(code,me,myName):game==='bj'?bjLobby(code,me,myName):newLobby(code,me,myName);
     S.code=code;
     persist();
     hostChanged();
@@ -1225,7 +1393,11 @@ function materializeP(v){
 function materializeD(v){
   return Object.assign({},v,{game:'durak',order:v.order||[],players:v.players||{},counts:v.counts||{},table:v.table||[],passed:v.passed||{},out:v.out||[],log:v.log||[],chat:v.chat||[],hand:v.hand||[],opts:v.opts||{transfer:false,deck:36}});
 }
+function materializeB(v){
+  return Object.assign({},v,{game:'bj',order:v.order||[],players:v.players||{},counts:v.counts||{},dealer:v.dealer||[],stood:v.stood||{},scores:v.scores||{},log:v.log||[],chat:v.chat||[],hand:v.hand||[],opts:v.opts||{deck:36}});
+}
 function materialize(v){
+  if(v.game==='bj')return materializeB(v);
   if(v.game==='durak')return materializeD(v);
   if(v.game==='penky')return materializeP(v);
   const g={code:v.code,status:v.status,host:v.host,order:v.order||[],players:v.players||{},books:v.books||{},turn:v.turn,round:v.round||0,asks:v.asks||[],chat:v.chat||[],pend:v.pend||null,priv:v.priv||[]};
@@ -1341,8 +1513,9 @@ function doAsk(){
   if(!canAsk(G,me,selT,selR))return;
   sendBusy({t:'ask',to:selT,rank:selR});
 }
-function skipTurn(){if(G&&G.game==='durak'){if(isHost()&&G.status==='play')act({t:'skip'});return}if(G&&G.game==='penky'){if(isHost()&&G.status==='play'&&G.turn!==me)act({t:'skip'});return}if(isHost()&&G&&G.status==='play'&&mustAct(G)!==me)act({t:'skip'})}
-function rerender(){if(G)(G.game==='durak'?renderDurak():G.game==='penky'?renderPenky():renderGame())}
+function skipTurn(){if(G&&G.game==='bj'){if(isHost()&&G.status==='play')act({t:'skip'});return}
+  if(G&&G.game==='durak'){if(isHost()&&G.status==='play')act({t:'skip'});return}if(G&&G.game==='penky'){if(isHost()&&G.status==='play'&&G.turn!==me)act({t:'skip'});return}if(isHost()&&G&&G.status==='play'&&mustAct(G)!==me)act({t:'skip'})}
+function rerender(){if(G)(G.game==='bj'?renderBj():G.game==='durak'?renderDurak():G.game==='penky'?renderPenky():renderGame())}
 function sendBusy(m){
   busy=true;rerender();
   clearTimeout(busyTimer);
@@ -1383,6 +1556,7 @@ function pickRank(r){
 /* ---------- entering ---------- */
 const HERO={
   skrynky:['Скриньки','Карткова гра на 54 карти для 2–6 гравців. Питайте карти один в одного й збирайте скриньки: чотири однакові карти або двоє джокерів.'],
+  bj:['Очко (21)','Класичне «очко» для 2–6 гравців: набирайте 21 або ближче до нього, ніж банк, і не перебирайте. Режим «Очко» на 36 карт або «Блекджек» на 52 обирається в лобі.'],
   durak:['Дурак','Класична гра для 2–6 гравців: відбивайте карти, докидайте й не лишайтеся останнім із картами. Звичайний або перевідний режим і колода на 36 чи 52 карти з джокерами обираються в лобі.'],
   penky:['Пеньки','Карткова гра на 52 карти для 2–6 гравців. Скидайте карти на спільну стопку: двійка її обнуляє, десятка спалює. Хто лишиться з картами останнім, програє.']
 };
@@ -1430,6 +1604,10 @@ function resumeSaved(){
 /* ---------- rendering ---------- */
 function onGame(){
   if(!G)return;
+  if(G.game==='bj'){
+    if(G.status==='lobby'){show('lobby');renderLobby();return}
+    show('bj');renderBj();return;
+  }
   if(G.game==='durak'){
     if(G.status==='lobby'){show('lobby');renderLobby();return}
     show('durak');renderDurak();return;
@@ -1455,6 +1633,15 @@ function onGame(){
 }
 function renderLobbyOpts(){
   const box=$('lobby-opts');
+  if(G.game==='bj'){
+    const o=G.opts||{deck:36},host=isHost();
+    const b=(k,on,txt)=>'<button type="button" class="opt'+(on?' on':'')+'" data-opt="'+k+'"'+(host?'':' disabled')+'>'+txt+'</button>';
+    box.hidden=false;
+    box.innerHTML='<p class="eyebrow">Налаштування гри'+(host?'':' · обирає ведучий')+'</p>'+
+      '<div class="gq"><p>Правила</p><div class="opts">'+b('d36',o.deck===36,'Очко · 36 карт')+b('d52',o.deck===52,'Блекджек · 52 карти')+'</div></div>'+
+      '<p class="hint">'+(o.deck===36?'Валет 2, дама 3, король 4, туз 11. Два тузи — «золоте очко».':'Фігури по 10, туз 11 або 1.')+'</p>';
+    return;
+  }
   if(G.game!=='durak'){box.hidden=true;box.innerHTML='';return}
   const o=G.opts||{transfer:false,deck:36},host=isHost();
   const b=(k,on,txt)=>'<button type="button" class="opt'+(on?' on':'')+'" data-opt="'+k+'"'+(host?'':' disabled')+'>'+txt+'</button>';
@@ -1479,7 +1666,7 @@ function renderLobby(){
   $('lobby-actions').innerHTML=
     (host
       ?'<button class="btn" type="button" data-act="start"'+(ids.length<2?' disabled':'')+'>Почати гру</button>'+
-        '<p class="muted">'+(ids.length<2?'Потрібно щонайменше двоє гравців.':(pk?'Кожен отримає 3 карти в руку й 2 закриті.':dk?'Кожен отримає по 6 карт.':'Кожен отримає по 4 карти.'))+'</p>'
+        '<p class="muted">'+(ids.length<2?'Потрібно щонайменше двоє гравців.':(pk?'Кожен отримає 3 карти в руку й 2 закриті.':dk?'Кожен отримає по 6 карт.':gm==='bj'?'Усі грають проти банку: по 2 карти кожному.':'Кожен отримає по 4 карти.'))+'</p>'
       :'<p class="muted">Чекаємо, поки ведучий почне гру.</p>')+
     '<button class="btn ghost" type="button" data-act="leave">'+(host?'Закрити гру':'Вийти')+'</button>';
 }
@@ -1862,6 +2049,90 @@ function renderDurak(){
   renderDFeed();
 }
 
+/* ---------- «Очко» / 21: rendering and actions ---------- */
+const bjDeck=()=>(G.opts&&G.opts.deck)||36;
+const bjSign=n=>n>0?'+'+n:String(n);
+function bjAct(t){if(busy||!G||G.status!=='play'||G.turn!==me)return;sendBusy({t:t})}
+const bjBack='<span class="mini back" aria-hidden="true"></span>';
+function bjPlayerHTML(u){
+  const done=G.status==='done',turn=G.status==='play'&&G.turn===u,n=G.counts[u]||0;
+  let body;
+  if(done&&G.hands&&G.hands[u]){
+    const h=bjHand(G.hands[u],bjDeck()),r=G.results&&G.results[u];
+    body='<span class="bjrow">'+G.hands[u].map(miniHTML).join('')+'<span class="bjsum">'+(h.golden?'золоте очко':h.bust?'перебір '+h.v:h.v)+'</span></span>'+
+      (r?'<span class="'+(r.r==='win'?'ok':'no')+'">'+(r.r==='win'?'виграш '+bjSign(r.d):r.r==='lose'?'програш −1':'нічия')+'</span>':'');
+  }else{
+    body='<span class="bjrow">'+bjBack.repeat(Math.min(n,8))+'<span class="muted" style="color:var(--table-muted);font-size:12px">'+n+' '+plural(n,['карта','карти','карт'])+'</span></span>';
+  }
+  return '<div class="pl'+(turn?' turn':'')+'" style="--pc:'+pcv(u)+'">'+
+    '<span class="plh"><span class="av">'+esc(initial(nm(u)))+'</span><span class="nm">'+esc(nm(u))+'</span>'+
+    (u===me?'<span class="tag">ви</span>':'')+(G.players[u]&&G.players[u].online===false?'<span class="tag off">поза мережею</span>':'')+
+    (turn?'<span class="pill-turn">ходить</span>':'')+(G.status==='play'&&G.stood[u]?'<span class="tag">досить</span>':'')+'</span>'+body+
+    '<span class="score">Рахунок: <b>'+bjSign(G.scores[u]||0)+'</b></span></div>';
+}
+function bjCenterHTML(){
+  const done=G.status==='done',dk=bjDeck();
+  let cards=G.dealer.map(cardHTML).join('');
+  if(!done)cards+='<span class="card back" aria-hidden="true"></span>'.repeat(Math.max(0,G.dealerN-G.dealer.length));
+  const dh=done?bjHand(G.dealer,dk):null;
+  let h='<div class="hand-head"><span class="eyebrow">Банк</span><span class="bjsum">'+(done?(dh.golden?'золоте очко':dh.bust?'перебір '+dh.v:dh.v):'')+'</span></div><div class="hand">'+cards+'</div>';
+  if(done&&G.results){
+    const win=G.order.filter(u=>G.results[u].r==='win').length;
+    h+='<p class="muted">Раунд завершено: виграли '+win+' з '+G.order.length+'. Рахунок оновлено.</p>';
+  }
+  return h;
+}
+function bjActionHTML(isPlayer){
+  const leaveBtn='<button class="btn ghost sm" type="button" data-act="leave">'+(isHost()?'Закрити гру':'Вийти з гри')+'</button>';
+  if(G.status==='done'){
+    return isHost()
+      ?'<button class="btn" type="button" data-act="again">Нова роздача</button>'+leaveBtn
+      :'<p class="muted">Чекаємо, поки ведучий почне нову роздачу.</p>'+leaveBtn;
+  }
+  if(!isPlayer)return '<p class="muted">Ви спостерігаєте за грою.</p>'+leaveBtn;
+  if(G.turn===me){
+    const d=busy?' disabled':'';
+    return '<p><b>Ваш хід.</b> Беріть карту або кажіть «Досить».</p><div class="row"><button class="btn" type="button" data-act="hit"'+d+'>Ще карту</button><button class="btn ghost" type="button" data-act="stand"'+d+'>Досить</button></div>';
+  }
+  const skip=isHost()?'<button class="btn ghost sm" type="button" data-act="skip">Пропустити хід гравця</button>':'';
+  return '<div class="wait"><span class="dot" aria-hidden="true"></span><span>'+(G.stood[me]?'Ви зупинились. ':'')+'Ходить <b>'+esc(nm(G.turn))+'</b></span></div>'+skip;
+}
+function bjLogHTML(e){
+  const who=u=>'<span class="who" style="--pc:'+pcv(u)+'">'+esc(nm(u))+'</span>';
+  if(e.k==='round')return '<span class="ok">Роздача №'+e.n+'</span>';
+  if(e.k==='hit')return who(e.f)+' <span class="no">бере карту (тепер '+e.n+')</span>';
+  if(e.k==='stand')return who(e.f)+' <span class="no">каже: досить</span>';
+  if(e.k==='skip')return who(e.f)+' <span class="no">· хід пропущено ведучим</span>';
+  if(e.k==='dealer')return '<span class="no">Банк відкривається'+(e.n?' і бере '+e.n+' '+plural(e.n,['карту','карти','карт']):'')+'</span>';
+  return '';
+}
+function renderBFeed(){
+  const box=$('bfeed');
+  if(!box||!G||G.status==='lobby')return;
+  const items=[];
+  (G.log||[]).forEach(e=>{const h=bjLogHTML(e);if(h)items.push({ts:e.ts,h:'<div class="ev">'+h+'</div>'})});
+  (G.chat||[]).forEach(m=>items.push({ts:m.ts,h:msgHTML(m)}));
+  items.sort((a,b)=>a.ts-b.ts);
+  const near=box.scrollHeight-box.scrollTop-box.clientHeight<60;
+  box.innerHTML=items.length?items.slice(-60).map(i=>i.h).join(''):'<p class="muted empty-feed">Тут з’являтимуться ходи гри й повідомлення гравців.</p>';
+  if(near)box.scrollTop=box.scrollHeight;
+}
+function renderBj(){
+  const order=G.order||[],isPlayer=order.indexOf(me)>=0;
+  $('b-code').textContent=roomCode;
+  $('b-round').textContent='№'+G.round;
+  $('b-mode').textContent=bjDeck()===36?'Очко · 36':'Блекджек · 52';
+  $('btn-leave-bj').textContent=isHost()?'Закрити гру':'Вийти';
+  $('b-players').innerHTML=order.map(bjPlayerHTML).join('');
+  $('b-center').innerHTML=bjCenterHTML();
+  $('b-mine').hidden=!isPlayer;
+  const h=bjHand(G.hand,bjDeck());
+  $('b-sum').textContent=G.hand.length?'Сума: '+(h.golden?'золоте очко!':h.bust?'перебір '+h.v:h.v+(h.natural?' · очко!':h.soft?' (туз як 11)':'')):'';
+  $('b-hand').innerHTML=G.hand.map(cardHTML).join('');
+  $('b-action').innerHTML=bjActionHTML(isPlayer);
+  renderBFeed();
+}
+
 function msgHTML(m){
   const mine=m.u===me;
   return '<div class="msg'+(mine?' mine':'')+'" style="--pc:'+pcv(m.u)+'"><b>'+esc(nm(m.u))+'</b>'+esc(m.t)+'</div>';
@@ -1932,7 +2203,16 @@ function bind(){
     else if(a==='again')againAct();
     else if(a==='take'){if(G&&G.game==='durak')dTake();else pTake()}
     else if(a==='pass')dPass();
+    else if(a==='hit')bjAct('hit');
+    else if(a==='stand')bjAct('stand');
     else if(a==='dtransfer')dTransfer();
+  });
+  $('bchat-form').addEventListener('submit',e=>{
+    e.preventDefault();
+    const input=$('bchat-input'),t=input.value.trim().slice(0,200);
+    if(!t||!G||G.status==='lobby')return;
+    input.value='';
+    act({t:'chat',text:t});
   });
   $('dchat-form').addEventListener('submit',e=>{
     e.preventDefault();
